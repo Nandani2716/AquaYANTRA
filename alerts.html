@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alerts — AquaGuard</title>
+  <meta name="description" content="Active water quality alerts sent to Ministry of Health and local hospitals across India." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .alerts-full-list { }
+    .alert-full-item { display:flex; gap:16px; padding:18px 24px; border-bottom:1px solid var(--border); align-items:flex-start; transition:background var(--transition); }
+    .alert-full-item:hover { background:var(--bg2); }
+    .alert-full-item:last-child { border-bottom:none; }
+    .afi-icon-wrap { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .afi-critical { background:#fee2e2; }
+    .afi-warning { background:#fef3c7; }
+    .afi-info { background:#eff6ff; }
+    .afi-success { background:#dcfce7; }
+    .afi-body { flex:1; }
+    .afi-title { font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
+    .afi-desc { font-size:12.5px; color:var(--text-secondary); margin-bottom:8px; line-height:1.5; }
+    .afi-meta { display:flex; gap:10px; flex-wrap:wrap; }
+    .afi-tag { font-size:11px; font-weight:600; padding:3px 8px; border-radius:99px; background:var(--bg); border:1px solid var(--border); color:var(--text-secondary); }
+    .afi-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+    .afi-time { font-size:11.5px; color:var(--text-muted); white-space:nowrap; }
+    .afi-actions { display:flex; gap:6px; }
+    .afi-btn { font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:6px; cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--text-secondary); transition:all var(--transition); }
+    .afi-btn:hover { border-color:var(--blue-400); color:var(--blue-600); background:var(--blue-50); }
+    .afi-btn.primary { background:var(--blue-500); color:white; border-color:var(--blue-500); }
+    .afi-btn.primary:hover { background:var(--blue-600); border-color:var(--blue-600); }
+    .notify-form { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:22px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group.full { grid-column:1/-1; }
+    .form-label { font-size:12.5px; font-weight:600; color:var(--text-secondary); }
+    .form-input, .form-select, .form-textarea { padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); font-size:13.5px; font-family:'Inter',sans-serif; color:var(--text-primary); transition:border var(--transition); outline:none; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--blue-400); background:white; }
+    .form-textarea { resize:vertical; min-height:90px; }
+    .send-alert-btn { grid-column:1/-1; padding:12px; background:linear-gradient(135deg,#ef4444,#f97316); border:none; border-radius:var(--radius-sm); color:white; font-size:14px; font-weight:700; cursor:pointer; transition:all var(--transition); }
+    .send-alert-btn:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(239,68,68,0.35); }
+    .notif-chips { display:flex; gap:8px; flex-wrap:wrap; }
+    .notif-chip { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid var(--border); border-radius:99px; cursor:pointer; background:var(--bg); font-size:13px; font-weight:500; color:var(--text-secondary); transition:all var(--transition); }
+    .notif-chip.selected { border-color:var(--blue-400); background:var(--blue-50); color:var(--blue-600); }
+    .notif-chip input { display:none; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg></div><span class="logo-text">AquaGuard</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item active"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-btn" onclick="toggleSidebar()">☰</button><div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">Alerts</span></div></div>
+      <div class="topbar-right"><div class="realtime-chip"><span class="pulse-dot"></span><span>Live Alerts</span></div><div class="date-chip" id="live-date"></div></div>
+    </header>
+
+    <div class="page-body">
+      <div class="hero-section" style="background:linear-gradient(135deg,#fff7ed,#fff1f2);">
+        <div class="hero-text">
+          <h1 class="hero-title">🔔 Alerts — Ministry & Hospital Notifications</h1>
+          <p class="hero-sub">ML-triggered alerts sent to Ministry of Jal Shakti, MOHFW, and district hospitals in real-time when water quality thresholds are breached.</p>
+        </div>
+        <div class="hero-status-strip">
+          <div class="status-item status-danger"><span class="s-icon">🚨</span><div><div class="s-val">3</div><div class="s-lbl">Active Critical</div></div></div>
+          <div class="status-item status-warn"><span class="s-icon">⚠️</span><div><div class="s-val">11</div><div class="s-lbl">Warnings</div></div></div>
+          <div class="status-item status-safe"><span class="s-icon">✅</span><div><div class="s-val">42</div><div class="s-lbl">Resolved (24h)</div></div></div>
+        </div>
+      </div>
+
+      <!-- Active Alerts -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Active Alerts</div><div class="card-sub">Sorted by severity · Auto-escalates every 4 hours</div></div>
+          <div class="card-actions">
+            <button class="chip-btn active">All</button>
+            <button class="chip-btn">Critical</button>
+            <button class="chip-btn">Warning</button>
+            <button class="chip-btn">Resolved</button>
+          </div>
+        </div>
+        <div class="alerts-full-list">
+          <div class="alert-full-item">
+            <div class="afi-icon-wrap afi-critical">🚨</div>
+            <div class="afi-body">
+              <div class="afi-title">Cholera Outbreak Risk — Varanasi, Uttar Pradesh</div>
+              <div class="afi-desc">Total Coliform: 642 CFU/100mL (threshold: 500). ML model confidence: 91%. Notification sent to CMO Varanasi, District Hospital, MOHFW, and Ministry of Jal Shakti.</div>
+              <div class="afi-meta">
+                <span class="afi-tag">📡 CPCB-UP-001</span>
+                <span class="afi-tag">🏥 District Hospital Notified</span>
+                <span class="afi-tag">🏛️ Ministry Notified</span>
+                <span class="afi-tag">🔬 Coliform: 642 CFU</span>
+              </div>
+            </div>
+            <div class="afi-right">
+              <div class="afi-time">2 hours ago</div>
+              <div class="afi-actions">
+                <button class="afi-btn">Acknowledge</button>
+                <button class="afi-btn primary">Escalate</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert-full-item">
+            <div class="afi-icon-wrap afi-warning">⚠️</div>
+            <div class="afi-body">
+              <div class="afi-title">Turbidity Spike — Patna, Bihar</div>
+              <div class="afi-desc">Turbidity reached 12.4 NTU (WHO threshold: 5 NTU). Possible upstream contamination. Enhanced sampling initiated. 3 community reports correlated.</div>
+              <div class="afi-meta">
+                <span class="afi-tag">📡 CPCB-BR-002</span>
+                <span class="afi-tag">🏥 Patna AIIMS Notified</span>
+                <span class="afi-tag">🌧️ Post-rainfall event</span>
+              </div>
+            </div>
+            <div class="afi-right">
+              <div class="afi-time">4 hours ago</div>
+              <div class="afi-actions">
+                <button class="afi-btn">Acknowledge</button>
+                <button class="afi-btn primary">Escalate</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert-full-item">
+            <div class="afi-icon-wrap afi-warning">⚠️</div>
+            <div class="afi-body">
+              <div class="afi-title">pH Anomaly — Kolkata, West Bengal</div>
+              <div class="afi-desc">pH: 9.8 detected (normal range: 6.5–8.5). Industrial discharge suspected. 2 community reports from Sector 5. Samples sent to CPCB lab for analysis.</div>
+              <div class="afi-meta">
+                <span class="afi-tag">📡 CPCB-WB-003</span>
+                <span class="afi-tag">🏥 Medical College Hospital</span>
+                <span class="afi-tag">🏭 Industrial discharge suspected</span>
+              </div>
+            </div>
+            <div class="afi-right">
+              <div class="afi-time">6 hours ago</div>
+              <div class="afi-actions">
+                <button class="afi-btn">Acknowledge</button>
+                <button class="afi-btn primary">Escalate</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert-full-item">
+            <div class="afi-icon-wrap afi-info">ℹ️</div>
+            <div class="afi-body">
+              <div class="afi-title">DO Level — Surat, Gujarat (Watch Mode)</div>
+              <div class="afi-desc">Dissolved Oxygen dropped to 4.8 mg/L (min: 6.0). ML model predicts continued decline. Pre-emptive watch alert sent to local authorities.</div>
+              <div class="afi-meta"><span class="afi-tag">📡 CPCB-GJ-007</span><span class="afi-tag">📊 ML Watch</span></div>
+            </div>
+            <div class="afi-right">
+              <div class="afi-time">9 hours ago</div>
+              <div class="afi-actions"><button class="afi-btn">Dismiss</button></div>
+            </div>
+          </div>
+
+          <div class="alert-full-item" style="opacity:0.6;">
+            <div class="afi-icon-wrap afi-success">✅</div>
+            <div class="afi-body">
+              <div class="afi-title">DO Level Recovery — Chennai, Tamil Nadu <span style="font-size:11px;font-weight:500;color:#16a34a;"> RESOLVED</span></div>
+              <div class="afi-desc">Dissolved Oxygen returned to 6.4 mg/L. Water quality restored to safe levels. All clear issued to notified hospitals.</div>
+              <div class="afi-meta"><span class="afi-tag">📡 CPCB-TN-005</span><span class="afi-tag" style="background:#dcfce7;color:#16a34a;">✓ Resolved</span></div>
+            </div>
+            <div class="afi-right"><div class="afi-time">12 hours ago</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Send New Alert -->
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">📤 Send New Alert</div><div class="card-sub">Manually dispatch notification to ministry and hospitals</div></div></div>
+        <form class="notify-form" onsubmit="sendAlert(event)">
+          <div class="form-group">
+            <label class="form-label">Location / Zone</label>
+            <input type="text" class="form-input" placeholder="e.g. Varanasi, Uttar Pradesh" id="alert-location" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severity Level</label>
+            <select class="form-select" id="alert-severity">
+              <option>🚨 Critical — Immediate Action</option>
+              <option>⚠️ High — Alert Mode</option>
+              <option>ℹ️ Watch — Monitor Closely</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Notify (select all applicable)</label>
+            <div class="notif-chips">
+              <label class="notif-chip selected"><input type="checkbox" checked/> 🏛️ Ministry of Jal Shakti</label>
+              <label class="notif-chip selected"><input type="checkbox" checked/> 🏥 MOHFW</label>
+              <label class="notif-chip"><input type="checkbox"/> 🏨 District Hospitals</label>
+              <label class="notif-chip"><input type="checkbox"/> 📢 State Govt</label>
+              <label class="notif-chip"><input type="checkbox"/> 🌐 NDMA</label>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Alert Message</label>
+            <textarea class="form-textarea" placeholder="Describe the water quality issue, parameters, and recommended action..." id="alert-msg"></textarea>
+          </div>
+          <button type="submit" class="send-alert-btn" id="btn-send-alert">🚨 Send Alert Now</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.querySelectorAll('.notif-chip').forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+    function sendAlert(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-send-alert');
+      btn.textContent = '✅ Alert Sent Successfully!';
+      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+      setTimeout(() => { btn.textContent = '🚨 Send Alert Now'; btn.style.background = ''; }, 3000);
+    }
+  </script>
+</body>
+</html>

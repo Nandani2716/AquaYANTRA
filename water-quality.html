@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Quality — AquaGuard</title>
+  <meta name="description" content="14-day CPCB water quality sensor data with parameter trends and station-wise breakdown." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .param-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:22px; }
+    .param-card { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:16px; transition:all var(--transition); }
+    .param-card:hover { border-color:var(--blue-400); transform:translateY(-2px); box-shadow:var(--shadow-hov); }
+    .param-name { font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
+    .param-value { font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:var(--text-primary); line-height:1; }
+    .param-unit { font-size:12px; color:var(--text-muted); margin-top:3px; }
+    .param-status { font-size:11px; font-weight:600; padding:3px 8px; border-radius:99px; display:inline-block; margin-top:8px; }
+    .ps-safe { background:#dcfce7; color:#16a34a; }
+    .ps-warn { background:#fef3c7; color:#d97706; }
+    .ps-danger { background:#fee2e2; color:#dc2626; }
+    .station-table { width:100%; border-collapse:collapse; }
+    .station-table th { background:var(--bg2); color:var(--text-muted); font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; padding:10px 20px; text-align:left; border-bottom:1.5px solid var(--border); }
+    .station-table td { padding:12px 20px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary); }
+    .station-table tr:last-child td { border-bottom:none; }
+    .station-table tr:hover td { background:var(--bg2); }
+    .wqi-badge { font-size:12px; font-weight:700; padding:3px 10px; border-radius:99px; }
+    .trend-chart-area { padding:20px 22px; height:300px; }
+    @media(max-width:768px){.param-grid{grid-template-columns:repeat(2,1fr);}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg>
+      </div>
+      <span class="logo-text">AquaGuard</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item active" id="nav-water"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item" id="nav-heatmap"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item" id="nav-alerts"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item" id="nav-patients"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item" id="nav-community"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item" id="nav-analytics"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">Water Quality</span></div>
+      </div>
+      <div class="topbar-right">
+        <div class="realtime-chip"><span class="pulse-dot"></span><span>CPCB Live Feed</span></div>
+        <div class="date-chip" id="live-date"></div>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <!-- Hero -->
+      <div class="hero-section" style="background:linear-gradient(135deg,#eff6ff,#f0fdfa);">
+        <div class="hero-text">
+          <h1 class="hero-title">🧪 Water Quality Monitoring</h1>
+          <p class="hero-sub">Real-time CPCB sensor readings across 1,240 stations. Tracking last 14 days of water quality parameters for early warning.</p>
+        </div>
+        <div class="hero-status-strip">
+          <div class="status-item status-safe"><span class="s-icon">💧</span><div><div class="s-val">72.4</div><div class="s-lbl">Nat. Avg WQI</div></div></div>
+          <div class="status-item status-neutral"><span class="s-icon">📡</span><div><div class="s-val">1,240</div><div class="s-lbl">Active Stations</div></div></div>
+          <div class="status-item status-warn"><span class="s-icon">⚠️</span><div><div class="s-val">47</div><div class="s-lbl">Anomalies Today</div></div></div>
+        </div>
+      </div>
+
+      <!-- Current Parameters -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Current Water Parameters (National Average)</div><div class="card-sub">Updated every 15 minutes · CPCB real-time API</div></div>
+          <button class="chip-btn active">All Stations</button>
+        </div>
+        <div class="param-grid">
+          <div class="param-card"><div class="param-name">pH Level</div><div class="param-value">7.3</div><div class="param-unit">Range: 6.5–8.5</div><div class="param-status ps-safe">✓ Normal</div></div>
+          <div class="param-card"><div class="param-name">Turbidity</div><div class="param-value">3.8</div><div class="param-unit">NTU (threshold: 5)</div><div class="param-status ps-safe">✓ Normal</div></div>
+          <div class="param-card" style="border-color:#fde68a"><div class="param-name">Dissolved Oxygen</div><div class="param-value">5.2</div><div class="param-unit">mg/L (min: 6)</div><div class="param-status ps-warn">⚠ Low</div></div>
+          <div class="param-card"><div class="param-name">Total Coliform</div><div class="param-value">48</div><div class="param-unit">CFU/100mL (max: 500)</div><div class="param-status ps-safe">✓ Normal</div></div>
+          <div class="param-card"><div class="param-name">BOD</div><div class="param-value">2.1</div><div class="param-unit">mg/L (max: 3)</div><div class="param-status ps-safe">✓ Normal</div></div>
+          <div class="param-card"><div class="param-name">TDS</div><div class="param-value">312</div><div class="param-unit">mg/L (max: 500)</div><div class="param-status ps-safe">✓ Normal</div></div>
+          <div class="param-card" style="border-color:#fca5a5"><div class="param-name">Nitrates</div><div class="param-value">52.4</div><div class="param-unit">mg/L (max: 45)</div><div class="param-status ps-danger">🚨 High</div></div>
+          <div class="param-card"><div class="param-name">Temperature</div><div class="param-value">24.6</div><div class="param-unit">°C</div><div class="param-status ps-safe">✓ Normal</div></div>
+        </div>
+      </div>
+
+      <!-- 14-Day Trend -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">14-Day Parameter Trends</div><div class="card-sub">Aggregated daily averages across all active CPCB stations</div></div>
+          <div class="card-actions">
+            <button class="chip-btn active" onclick="switchParam('wqi',this)">WQI</button>
+            <button class="chip-btn" onclick="switchParam('ph',this)">pH</button>
+            <button class="chip-btn" onclick="switchParam('do',this)">DO</button>
+            <button class="chip-btn" onclick="switchParam('turb',this)">Turbidity</button>
+          </div>
+        </div>
+        <div class="trend-chart-area"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <!-- Station Table -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Top CPCB Monitoring Stations</div><div class="card-sub">Sorted by WQI · Click any row for full 14-day data</div></div>
+          <a href="#" class="view-all-btn">Export CSV →</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="station-table">
+            <thead><tr><th>Station ID</th><th>Location</th><th>State</th><th>WQI Score</th><th>pH</th><th>Turbidity</th><th>Coliform</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>CPCB-UP-001</td><td>Varanasi</td><td>Uttar Pradesh</td><td><span class="wqi-badge" style="background:#fee2e2;color:#dc2626">34.2</span></td><td>8.9</td><td>11.2</td><td>642</td><td><span class="param-status ps-danger">Critical</span></td></tr>
+              <tr><td>CPCB-BR-002</td><td>Patna</td><td>Bihar</td><td><span class="wqi-badge" style="background:#fef3c7;color:#d97706">52.1</span></td><td>7.8</td><td>12.4</td><td>180</td><td><span class="param-status ps-warn">At Risk</span></td></tr>
+              <tr><td>CPCB-WB-003</td><td>Kolkata</td><td>West Bengal</td><td><span class="wqi-badge" style="background:#fef3c7;color:#d97706">58.7</span></td><td>9.8</td><td>4.2</td><td>95</td><td><span class="param-status ps-warn">At Risk</span></td></tr>
+              <tr><td>CPCB-MH-004</td><td>Mumbai</td><td>Maharashtra</td><td><span class="wqi-badge" style="background:#dcfce7;color:#16a34a">78.3</span></td><td>7.2</td><td>2.1</td><td>30</td><td><span class="param-status ps-safe">Safe</span></td></tr>
+              <tr><td>CPCB-TN-005</td><td>Chennai</td><td>Tamil Nadu</td><td><span class="wqi-badge" style="background:#dcfce7;color:#16a34a">82.5</span></td><td>7.0</td><td>1.8</td><td>22</td><td><span class="param-status ps-safe">Safe</span></td></tr>
+              <tr><td>CPCB-RJ-006</td><td>Jaipur</td><td>Rajasthan</td><td><span class="wqi-badge" style="background:#dcfce7;color:#16a34a">74.1</span></td><td>7.5</td><td>3.0</td><td>45</td><td><span class="param-status ps-safe">Safe</span></td></tr>
+              <tr><td>CPCB-GJ-007</td><td>Surat</td><td>Gujarat</td><td><span class="wqi-badge" style="background:#fef3c7;color:#d97706">61.2</span></td><td>7.4</td><td>6.8</td><td>210</td><td><span class="param-status ps-warn">At Risk</span></td></tr>
+              <tr><td>CPCB-MP-008</td><td>Bhopal</td><td>Madhya Pradesh</td><td><span class="wqi-badge" style="background:#dcfce7;color:#16a34a">70.9</span></td><td>7.1</td><td>4.5</td><td>88</td><td><span class="param-status ps-safe">Safe</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const trendCtx = document.getElementById('trendChart');
+    const labels14 = (()=>{const a=[];const t=new Date();for(let i=13;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);a.push(d.toLocaleDateString('en-IN',{month:'short',day:'numeric'}));}return a;})();
+    const trendData = {
+      wqi:  [68.2,70.1,67.5,72.3,74.0,71.8,69.4,66.2,68.9,72.1,71.4,73.5,72.0,74.4],
+      ph:   [7.2,7.1,7.4,7.3,6.9,7.0,7.5,7.8,7.6,7.3,7.1,7.2,7.4,7.3],
+      do:   [6.1,5.8,5.9,6.0,5.5,5.4,5.2,5.1,5.3,5.5,5.6,5.8,5.9,5.2],
+      turb: [2.1,2.4,3.0,2.7,4.2,3.8,5.1,6.2,5.5,4.1,3.2,2.8,2.5,2.3]
+    };
+    const trendColors = {wqi:'#3b82f6',ph:'#14b8a6',do:'#8b5cf6',turb:'#f97316'};
+    let trendChart = new Chart(trendCtx,{
+      type:'line',
+      data:{labels:labels14,datasets:[{label:'WQI',data:trendData.wqi,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.4,pointRadius:4,pointBackgroundColor:'#3b82f6',pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',titleColor:'#94a3b8',bodyColor:'#f1f5f9',padding:12,cornerRadius:10}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}},y:{grid:{color:'#f1f5f9',borderDash:[4,4]},ticks:{color:'#94a3b8',font:{size:11}}}}}
+    });
+    window.switchParam = function(p,btn){
+      document.querySelectorAll('.card-actions .chip-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      trendChart.data.datasets[0].data=trendData[p];
+      trendChart.data.datasets[0].borderColor=trendColors[p];
+      trendChart.data.datasets[0].backgroundColor=trendColors[p].replace(')',',0.1)').replace('rgb','rgba');
+      trendChart.data.datasets[0].pointBackgroundColor=trendColors[p];
+      trendChart.update('active');
+    };
+  </script>
+</body>
+</html>

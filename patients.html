@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Intelligence — AquaGuard</title>
+  <meta name="description" content="ABDM-integrated patient data for waterborne disease prediction and syndromic surveillance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .patients-layout { display:grid; grid-template-columns:1fr 360px; gap:16px; }
+    .patient-table { width:100%; border-collapse:collapse; }
+    .patient-table th { background:var(--bg2); color:var(--text-muted); font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; padding:10px 20px; text-align:left; border-bottom:1.5px solid var(--border); }
+    .patient-table td { padding:13px 20px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary); }
+    .patient-table tr:last-child td { border-bottom:none; }
+    .patient-table tr:hover td { background:var(--bg2); cursor:pointer; }
+    .pt-id { font-family:monospace; font-size:12px; color:var(--text-muted); }
+    .pt-disease { font-size:12px; font-weight:700; padding:3px 9px; border-radius:99px; }
+    .disease-cholera { background:#fee2e2; color:#dc2626; }
+    .disease-typhoid { background:#ffedd5; color:#c2410c; }
+    .disease-hepatitis { background:#fef3c7; color:#d97706; }
+    .disease-dysentery { background:#ede9fe; color:#7c3aed; }
+    .disease-gastro { background:#ecfdf5; color:#059669; }
+    .risk-tag { font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; }
+    .risk-high { background:#fee2e2; color:#dc2626; }
+    .risk-med { background:#fef3c7; color:#d97706; }
+    .risk-low { background:#dcfce7; color:#16a34a; }
+    .abdm-badge { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:99px; background:linear-gradient(135deg,#eff6ff,#ede9fe); color:var(--blue-600); border:1px solid var(--blue-100); }
+    .predict-panel { display:flex; flex-direction:column; gap:14px; }
+    .predict-card { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:16px; }
+    .predict-card-title { font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:12px; }
+    .disease-risk-item { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .dri-icon { font-size:18px; }
+    .dri-info { flex:1; }
+    .dri-name { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:3px; }
+    .dri-bar-wrap { height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .dri-bar { height:100%; border-radius:99px; }
+    .dri-pct { font-size:12px; font-weight:700; color:var(--text-primary); width:36px; text-align:right; }
+    .summary-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .summary-cell { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px; text-align:center; }
+    .sc-val { font-family:'Outfit',sans-serif; font-size:24px; font-weight:800; color:var(--text-primary); line-height:1; }
+    .sc-lbl { font-size:11px; color:var(--text-muted); margin-top:4px; }
+    .trend-chart-area { padding:20px 22px; height:260px; }
+    @media(max-width:1000px){.patients-layout{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg></div><span class="logo-text">AquaGuard</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item active"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-btn" onclick="toggleSidebar()">☰</button><div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">Patient Intelligence</span></div></div>
+      <div class="topbar-right">
+        <div class="abdm-badge">🔒 ABDM Integrated · DPDP Compliant</div>
+        <div class="realtime-chip"><span class="pulse-dot"></span><span>Live Sync</span></div>
+        <div class="date-chip" id="live-date"></div>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <div class="hero-section" style="background:linear-gradient(135deg,#f5f3ff,#eff6ff);">
+        <div class="hero-text">
+          <h1 class="hero-title">🏥 ABDM Patient Intelligence</h1>
+          <p class="hero-sub">Syndromic surveillance via Ayushman Bharat Digital Mission. Patient data from local hospitals predicts upcoming waterborne disease outbreaks even before sensor alerts trigger.</p>
+        </div>
+        <div class="hero-status-strip">
+          <div class="status-item status-danger"><span class="s-icon">🧬</span><div><div class="s-val">1,482</div><div class="s-lbl">Cases (7d)</div></div></div>
+          <div class="status-item status-warn"><span class="s-icon">🏨</span><div><div class="s-val">214</div><div class="s-lbl">Admissions (24h)</div></div></div>
+          <div class="status-item status-neutral"><span class="s-icon">📊</span><div><div class="s-val">38</div><div class="s-lbl">Predicted Outbreaks</div></div></div>
+        </div>
+      </div>
+
+      <!-- Summary + Chart -->
+      <div class="card">
+        <div class="card-head"><div><div class="card-title">7-Day Case Trend vs ML Prediction</div><div class="card-sub">Blue = actual ABDM cases · Orange = ML prediction</div></div></div>
+        <div class="trend-chart-area"><canvas id="patientChart"></canvas></div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="patients-layout">
+        <!-- Patient Table -->
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Hospital Records — Waterborne Cases</div><div class="card-sub">Anonymized · ABDM-sourced · Last 24 hours</div></div>
+            <span class="abdm-badge">🔒 ABDM</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="patient-table">
+              <thead>
+                <tr>
+                  <th>Patient ID</th>
+                  <th>Age/Sex</th>
+                  <th>Location</th>
+                  <th>Symptoms</th>
+                  <th>Disease</th>
+                  <th>Risk</th>
+                  <th>Hospital</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="pt-id">ABHA-****-3481</td><td>42M</td><td>Varanasi, UP</td><td>Diarrhea, Vomiting</td><td><span class="pt-disease disease-cholera">Cholera</span></td><td><span class="risk-tag risk-high">High</span></td><td>Dist. Hospital</td></tr>
+                <tr><td class="pt-id">ABHA-****-2910</td><td>28F</td><td>Patna, BR</td><td>High Fever, Jaundice</td><td><span class="pt-disease disease-typhoid">Typhoid</span></td><td><span class="risk-tag risk-high">High</span></td><td>PMCH</td></tr>
+                <tr><td class="pt-id">ABHA-****-5520</td><td>8M</td><td>Noida, UP</td><td>Nausea, Abdominal pain</td><td><span class="pt-disease disease-gastro">Gastroenteritis</span></td><td><span class="risk-tag risk-med">Med</span></td><td>Child Hospital</td></tr>
+                <tr><td class="pt-id">ABHA-****-7741</td><td>55F</td><td>Kolkata, WB</td><td>Fatigue, Jaundice</td><td><span class="pt-disease disease-hepatitis">Hepatitis A</span></td><td><span class="risk-tag risk-med">Med</span></td><td>SSKM</td></tr>
+                <tr><td class="pt-id">ABHA-****-1832</td><td>36M</td><td>Surat, GJ</td><td>Bloody stool, Fever</td><td><span class="pt-disease disease-dysentery">Dysentery</span></td><td><span class="risk-tag risk-high">High</span></td><td>Civil Hospital</td></tr>
+                <tr><td class="pt-id">ABHA-****-4490</td><td>19F</td><td>Bhopal, MP</td><td>Diarrhea, Dehydration</td><td><span class="pt-disease disease-cholera">Cholera</span></td><td><span class="risk-tag risk-med">Med</span></td><td>Hamidia Hospital</td></tr>
+                <tr><td class="pt-id">ABHA-****-6601</td><td>71M</td><td>Agra, UP</td><td>Vomiting, Weakness</td><td><span class="pt-disease disease-typhoid">Typhoid</span></td><td><span class="risk-tag risk-high">High</span></td><td>District Hospital</td></tr>
+                <tr><td class="pt-id">ABHA-****-3377</td><td>14F</td><td>Delhi, NCR</td><td>Stomach cramps, Fever</td><td><span class="pt-disease disease-gastro">Gastroenteritis</span></td><td><span class="risk-tag risk-low">Low</span></td><td>Safdarjung</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Prediction Panel -->
+        <div class="predict-panel">
+          <div class="card predict-card-wrapper">
+            <div class="card-head"><div><div class="card-title">🔮 Outbreak Predictions</div><div class="card-sub">ML model · ABDM correlation</div></div></div>
+            <div style="padding:16px 20px;">
+              <div class="predict-card-title">Disease Risk (Next 7 Days)</div>
+              <div class="disease-risk-item">
+                <div class="dri-icon">🦠</div>
+                <div class="dri-info"><div class="dri-name">Cholera</div><div class="dri-bar-wrap"><div class="dri-bar" style="width:72%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div></div>
+                <div class="dri-pct">72%</div>
+              </div>
+              <div class="disease-risk-item">
+                <div class="dri-icon">🌡️</div>
+                <div class="dri-info"><div class="dri-name">Typhoid</div><div class="dri-bar-wrap"><div class="dri-bar" style="width:54%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div></div></div>
+                <div class="dri-pct">54%</div>
+              </div>
+              <div class="disease-risk-item">
+                <div class="dri-icon">🔬</div>
+                <div class="dri-info"><div class="dri-name">Hepatitis A</div><div class="dri-bar-wrap"><div class="dri-bar" style="width:38%;background:linear-gradient(90deg,#f59e0b,#eab308)"></div></div></div>
+                <div class="dri-pct">38%</div>
+              </div>
+              <div class="disease-risk-item">
+                <div class="dri-icon">💊</div>
+                <div class="dri-info"><div class="dri-name">Dysentery</div><div class="dri-bar-wrap"><div class="dri-bar" style="width:28%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div></div></div>
+                <div class="dri-pct">28%</div>
+              </div>
+              <div class="disease-risk-item">
+                <div class="dri-icon">🩺</div>
+                <div class="dri-info"><div class="dri-name">Leptospirosis</div><div class="dri-bar-wrap"><div class="dri-bar" style="width:19%;background:linear-gradient(90deg,#06b6d4,#3b82f6)"></div></div></div>
+                <div class="dri-pct">19%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><div class="card-title">Summary Stats</div><div class="card-sub">Current 24-hour period</div></div></div>
+            <div style="padding:16px 20px;">
+              <div class="summary-row">
+                <div class="summary-cell"><div class="sc-val" style="color:#ef4444">214</div><div class="sc-lbl">New Admissions</div></div>
+                <div class="summary-cell"><div class="sc-val" style="color:#f97316">38</div><div class="sc-lbl">High Risk</div></div>
+                <div class="summary-cell"><div class="sc-val" style="color:#16a34a">176</div><div class="sc-lbl">Recovered</div></div>
+              </div>
+              <div style="margin-top:14px;padding:12px;background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-radius:10px;border:1px solid #e0e7ff;">
+                <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:4px;">⚡ ABDM Predictive Signal</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Patient data indicates <strong>emerging cholera cluster</strong> in Varanasi zone — 3 days before sensor triggered alert. Correlation: 87%.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const ptCtx = document.getElementById('patientChart');
+    if(ptCtx){
+      const labels=['Day -6','Day -5','Day -4','Day -3','Day -2','Yesterday','Today'];
+      new Chart(ptCtx,{
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {label:'Actual Cases (ABDM)',data:[180,210,195,240,280,300,214],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#3b82f6',pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5},
+            {label:'ML Prediction',data:[170,220,200,255,270,310,240],borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.05)',fill:false,tension:0.4,borderDash:[6,4],pointRadius:4,pointBackgroundColor:'#f97316',pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2}
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,position:'top',labels:{color:'#475569',font:{size:12},boxWidth:14,padding:16}},tooltip:{backgroundColor:'#1e293b',titleColor:'#94a3b8',bodyColor:'#f1f5f9',padding:12,cornerRadius:10}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}},y:{grid:{color:'#f1f5f9',borderDash:[4,4]},ticks:{color:'#94a3b8',font:{size:11}}}}}
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+user_id,full_name,email,phone,role,institution,abdm_id,department,designation,state,district,city,registration_date,last_login,account_status,verified,reports_submitted,alerts_acknowledged,patients_entered,login_count
+USR-001,Nandani Shukla,nandani@aquaguard.in,+91-9876500001,hospital,AIIMS New Delhi,IN-HOS-DL-00001,Epidemiology & Public Health,Health Officer,Delhi,New Delhi,Delhi,2025-06-01,2026-04-14,Active,TRUE,0,12,45,142
+USR-002,Dr. Ananya Sharma,ananya.sharma@aiims.in,+91-9876500002,hospital,AIIMS New Delhi,IN-HOS-DL-00001,Emergency Medicine,Senior Resident,Delhi,New Delhi,Delhi,2025-07-15,2026-04-14,Active,TRUE,0,8,32,98
+USR-003,Dr. Rakesh Mishra,rakesh.mishra@pmchpatna.in,+91-9876500003,hospital,PMCH Patna,IN-HOS-BR-00118,Tropical Medicine,Associate Professor,Bihar,Patna,Patna,2025-08-10,2026-04-13,Active,TRUE,0,5,28,76
+USR-004,Dr. Priti Banerjee,priti.banerjee@sskm.in,+91-9876500004,hospital,SSKM Medical College,IN-HOS-WB-00224,Hepatology,Assistant Professor,West Bengal,Kolkata,Kolkata,2025-09-05,2026-04-13,Active,TRUE,0,4,22,65
+USR-005,Dr. Suresh Yadav,suresh.yadav@gsvm.in,+91-9876500005,hospital,GSVM Medical College,IN-HOS-UP-00468,Medicine,Professor & HOD,Uttar Pradesh,Kanpur Nagar,Kanpur,2025-06-20,2026-04-12,Active,TRUE,0,6,38,88
+USR-006,Demo Citizen,demo@citizen.in,+91-9876500006,user,,,,Citizen,Uttar Pradesh,Varanasi,Varanasi,2025-10-01,2026-04-14,Active,FALSE,4,0,0,28
+USR-007,Hospital Demo,hospital@aiims.in,+91-9876500007,hospital,AIIMS New Delhi,IN-HOS-DL-00001,Administration,Medical Superintendent,Delhi,New Delhi,Delhi,2025-10-01,2026-04-14,Active,TRUE,0,0,5,15
+USR-008,Rajesh Kumar,rajesh.kumar@gmail.com,+91-9876543210,user,,,,Citizen,Uttar Pradesh,Gautam Buddh Nagar,Noida,2026-01-15,2026-04-01,Active,FALSE,3,0,0,12
+USR-009,Priya Desai,priya.desai@yahoo.co.in,+91-9867452310,user,,,,Citizen,Gujarat,Surat,Surat,2026-02-20,2026-04-01,Active,FALSE,2,0,0,8
+USR-010,Amit Mehta,amit.m@hotmail.com,+91-9845678901,user,,,,Citizen,Madhya Pradesh,Bhopal,Bhopal,2026-01-08,2026-04-01,Active,FALSE,1,0,0,6
+USR-011,Vikram Patel,vpatel@gmail.com,+91-9801234567,user,,,,Citizen,Uttar Pradesh,Varanasi,Varanasi,2025-12-28,2026-04-01,Active,FALSE,1,0,0,14
+USR-012,Dr. Vandana Sinha,vandana.sinha@skmch.in,+91-9876500012,hospital,SKMCH Muzaffarpur,IN-HOS-BR-00219,Paediatrics,Senior Paediatrician,Bihar,Muzaffarpur,Muzaffarpur,2025-11-10,2026-04-14,Active,TRUE,0,3,18,52
+USR-013,Dr. Susan Paul,susan.paul@wbhealth.in,+91-9876500013,hospital,Diamond Harbour Govt Hospital,IN-HOS-WB-00336,Medicine,CMO South 24 PGS,West Bengal,South 24 Parganas,Diamond Harbour,2025-08-22,2026-04-12,Active,TRUE,0,4,15,44
+USR-014,Dr. Meera Tiwari,meera.tiwari@bhopalcmo.in,+91-9876500014,hospital,Hamidia Hospital Bhopal,IN-HOS-MP-00187,Public Health,CMO Bhopal,Madhya Pradesh,Bhopal,Bhopal,2025-09-18,2026-04-11,Active,TRUE,0,2,12,38
+USR-015,CMO Varanasi,cmo.varanasi@upgov.in,+91-9876500015,hospital,District Hospital Varanasi,IN-HOS-UP-00421,Administration,Chief Medical Officer,Uttar Pradesh,Varanasi,Varanasi,2025-07-01,2026-04-14,Active,TRUE,0,9,58,112
+USR-016,Kiran Bedi (Volunteer),kiran.vol@waterorg.in,+91-9845230000,user,,,,NGO Health Worker,Bihar,Muzaffarpur,Muzaffarpur,2026-03-01,2026-04-14,Active,FALSE,5,0,0,22
+USR-017,Dr. Pradeep Nair,pradeep.nair@gmch.in,+91-9876500017,hospital,GMCH Guwahati,IN-HOS-AS-00097,Medicine,Professor,Assam,Kamrup Metropolitan,Guwahati,2025-11-25,2026-04-10,Active,TRUE,0,1,9,28
+USR-018,PPCB Field Officer,field.officer@ppcb.in,+91-9876500018,hospital,Punjab Pollution Control Board,IN-GOV-PB-00001,Environment,Field Inspector,Punjab,Amritsar,Amritsar,2026-01-12,2026-04-13,Active,TRUE,0,2,0,18
+USR-019,Divya Krishnan,divya.k@gmail.com,+91-9867001234,user,,,,Citizen,Tamil Nadu,Chennai,Chennai,2026-02-14,2026-04-08,Active,FALSE,1,0,0,5
+USR-020,Mohd Rashid,m.rashid@gmail.com,+91-9856012345,user,,,,Citizen,West Bengal,South 24 Parganas,Kultali,2026-03-20,2026-04-06,Active,FALSE,1,0,0,4

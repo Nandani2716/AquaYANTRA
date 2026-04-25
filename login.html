@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — AquaGuard</title>
+  <meta name="description" content="Sign in to AquaGuard — India's national waterborne disease detection platform. Hospital and citizen access available." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-400: #60a5fa;
+      --blue-500: #3b82f6; --blue-600: #2563eb; --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+      --teal-400: #2dd4bf; --green: #22c55e; --orange: #f97316;
+      --red: #ef4444; --purple: #a855f7;
+      --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+      --border: #dbeafe; --surface: #ffffff; --bg: #f0f7ff;
+      --radius: 16px; --radius-sm: 10px;
+      --shadow: 0 4px 24px rgba(59,130,246,0.12);
+    }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* ── LAYOUT ── */
+    .auth-wrapper {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      background: linear-gradient(145deg, #0ea5e9 0%, #2563eb 40%, #7c3aed 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 52px;
+      overflow: hidden;
+    }
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='600' height='600' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='300' cy='300' r='200'/%3E%3Ccircle cx='300' cy='300' r='150'/%3E%3Ccircle cx='300' cy='300' r='100'/%3E%3Ccircle cx='300' cy='300' r='50'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center/cover;
+      pointer-events: none;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .lp-top { position: relative; z-index: 1; }
+    .lp-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 60px; }
+    .lp-logo-icon {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .lp-logo-text { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+    .lp-headline { font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 18px; letter-spacing: -1px; }
+    .lp-sub { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.7; max-width: 360px; }
+
+    .lp-stats { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+    .lp-stat {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    .lp-stat-icon { font-size: 24px; }
+    .lp-stat-val { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: white; line-height: 1; }
+    .lp-stat-lbl { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+    .floating-drop {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0.6; }
+      100% { transform: translateY(-600px) scale(0.5); opacity: 0; }
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 52px;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .auth-box { width: 100%; max-width: 420px; }
+
+    .auth-header { text-align: center; margin-bottom: 32px; }
+    .auth-title { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 6px; }
+    .auth-sub { font-size: 13.5px; color: var(--text-muted); }
+
+    /* Role Selector */
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 28px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px;
+    }
+
+    .role-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+      font-family: 'Inter', sans-serif;
+    }
+    .role-btn:hover { background: var(--blue-50); }
+    .role-btn.active {
+      background: var(--surface);
+      border-color: var(--blue-400);
+      box-shadow: 0 2px 12px rgba(59,130,246,0.15);
+    }
+    .role-icon { font-size: 24px; line-height: 1; }
+    .role-label { font-size: 13px; font-weight: 700; color: var(--text-secondary); }
+    .role-sub { font-size: 10.5px; color: var(--text-muted); }
+    .role-btn.active .role-label { color: var(--blue-600); }
+    .role-btn.active .role-sub { color: var(--blue-400); }
+
+    /* Form */
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .form-input {
+      width: 100%;
+      padding: 11px 14px 11px 42px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      font-size: 13.5px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      transition: all 0.2s;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--blue-400); background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+
+    .input-wrap .eye-btn {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--text-muted);
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .eye-btn:hover { color: var(--text-secondary); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Hospital-only fields */
+    .hospital-fields { display: none; flex-direction: column; gap: 16px; }
+    .hospital-fields.visible { display: flex; }
+
+    .form-select {
+      width: 100%;
+      padding: 11px 14px 11px 42px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      font-size: 13.5px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      transition: all 0.2s;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .form-select:focus { border-color: var(--blue-400); background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    .forgot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .check-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .check-label input { accent-color: var(--blue-500); width: 14px; height: 14px; }
+    .forgot-link { font-size: 13px; font-weight: 600; color: var(--blue-600); text-decoration: none; }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+    .submit-btn:active { transform: none; }
+
+    .hospital-btn-style {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6) !important;
+    }
+    .officer-btn-style {
+      background: linear-gradient(135deg, #059669, #0ea5e9) !important;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+    .register-link {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .register-link a { color: var(--blue-600); font-weight: 600; text-decoration: none; }
+    .register-link a:hover { text-decoration: underline; }
+
+    /* Error / success message */
+    .auth-msg {
+      display: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      align-items: center;
+      gap: 8px;
+    }
+    .auth-msg.error { display: flex; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .auth-msg.success { display: flex; background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+
+    /* Hospital badge */
+    .hospital-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #f5f3ff, #eff6ff);
+      border: 1.5px solid #c4b5fd;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 4px;
+    }
+    .hospital-badge.visible { display: flex; }
+    .hb-icon { font-size: 18px; }
+    .hb-text { font-size: 12px; font-weight: 600; color: #7c3aed; flex: 1; }
+
+    /* Footer */
+    .auth-footer {
+      position: absolute;
+      bottom: 24px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Demo credentials box */
+    .demo-box {
+      background: var(--bg);
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 4px;
+    }
+    .demo-box-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+    .demo-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 3px; }
+    .demo-row span:first-child { color: var(--text-muted); }
+    .demo-row strong { font-family: monospace; color: var(--blue-600); cursor: pointer; }
+    .demo-row strong:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .auth-wrapper { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel { padding: 40px 28px; }
+    }
+    @media (max-width: 480px) {
+      .right-panel { padding: 32px 20px; }
+      .lp-headline { font-size: 28px; }
+    }
+
+    /* Loading spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .submit-btn.loading .spinner { display: block; }
+    .submit-btn.loading .btn-text { opacity: 0.7; }
+    .submit-btn.loading .btn-arrow { display: none; }
+
+    /* Slide animation */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .auth-box { animation: fadeSlideUp 0.5s ease both; }
+  </style>
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+  <!-- ===== LEFT PANEL ===== -->
+  <div class="left-panel">
+
+    <!-- Floating drops -->
+    <div class="floating-drop" style="width:60px;height:60px;left:10%;bottom:0;animation-duration:8s;animation-delay:0s;"></div>
+    <div class="floating-drop" style="width:30px;height:30px;left:30%;bottom:0;animation-duration:6s;animation-delay:2s;"></div>
+    <div class="floating-drop" style="width:80px;height:80px;left:60%;bottom:0;animation-duration:10s;animation-delay:1s;"></div>
+    <div class="floating-drop" style="width:20px;height:20px;left:80%;bottom:0;animation-duration:7s;animation-delay:3s;"></div>
+    <div class="floating-drop" style="width:45px;height:45px;left:50%;bottom:0;animation-duration:9s;animation-delay:4s;"></div>
+
+    <div class="lp-top">
+      <div class="lp-logo">
+        <div class="lp-logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="white" fill-opacity="0.9"/>
+            <path d="M10 18.5a5 5 0 006 0" stroke="rgba(59,130,246,0.8)" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="lp-logo-text">AquaGuard</span>
+      </div>
+      <h1 class="lp-headline">Protecting India's Water, One Drop at a Time.</h1>
+      <p class="lp-sub">India's first AI-powered early warning system for waterborne disease outbreaks — integrating CPCB water data, ABDM patient records, and community surveillance.</p>
+    </div>
+
+    <div class="lp-stats">
+      <div class="lp-stat">
+        <span class="lp-stat-icon">📡</span>
+        <div>
+          <div class="lp-stat-val">1,240</div>
+          <div class="lp-stat-lbl">Active CPCB Monitoring Stations</div>
+        </div>
+      </div>
+      <div class="lp-stat">
+        <span class="lp-stat-icon">🧬</span>
+        <div>
+          <div class="lp-stat-val">94.7% Accuracy</div>
+          <div class="lp-stat-lbl">ML Outbreak Prediction Model</div>
+        </div>
+      </div>
+      <div class="lp-stat">
+        <span class="lp-stat-icon">🏥</span>
+        <div>
+          <div class="lp-stat-val">3,400+ Hospitals</div>
+          <div class="lp-stat-lbl">Connected via ABDM Integration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT PANEL ===== -->
+  <div class="right-panel">
+    <div class="auth-box">
+
+      <div class="auth-header">
+        <div class="auth-title" id="auth-title">Welcome Back 👋</div>
+        <p class="auth-sub" id="auth-sub">Sign in to access the AquaGuard dashboard</p>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="role-selector" role="group" aria-label="Select user type">
+        <button class="role-btn" id="role-user" onclick="setRole('user')" aria-pressed="true">
+          <span class="role-icon">👤</span>
+          <span class="role-label">Citizen</span>
+          <span class="role-sub">Community access</span>
+        </button>
+        <button class="role-btn" id="role-officer" onclick="setRole('officer')" aria-pressed="false">
+          <span class="role-icon">🛡️</span>
+          <span class="role-label">Officer</span>
+          <span class="role-sub">CPCB / Ministry</span>
+        </button>
+        <button class="role-btn" id="role-hospital" onclick="setRole('hospital')" aria-pressed="false">
+          <span class="role-icon">🏥</span>
+          <span class="role-label">Hospital</span>
+          <span class="role-sub">ABDM institution</span>
+        </button>
+      </div>
+
+      <!-- Hospital Verification Badge -->
+      <div class="hospital-badge" id="hospital-badge">
+        <span class="hb-icon">🔒</span>
+        <div class="hb-text">Hospital login requires an ABDM-registered institution ID and is subject to verification.</div>
+      </div>
+
+      <!-- Error / Success -->
+      <div class="auth-msg" id="auth-msg"></div>
+
+      <!-- Login Form -->
+      <form class="auth-form" id="login-form" onsubmit="handleLogin(event)" autocomplete="on">
+
+        <!-- Hospital-only fields -->
+        <div class="hospital-fields" id="hospital-fields">
+          <div class="form-group">
+            <label class="form-label" for="hosp-id">Hospital / Institution ID</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏨</span>
+              <select class="form-select" id="hosp-id" name="hospital">
+                <option value="">Select your institution…</option>
+                <option>AIIMS New Delhi</option>
+                <option>AIIMS Patna</option>
+                <option>PGIMER Chandigarh</option>
+                <option>SSKM Kolkata</option>
+                <option>Safdarjung Hospital</option>
+                <option>District Hospital Varanasi</option>
+                <option>Civil Hospital Surat</option>
+                <option>Hamidia Hospital Bhopal</option>
+                <option>PMCH Patna</option>
+                <option>Medical College Hospital Kolkata</option>
+                <option>Other (Enter ABDM ID below)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="abdm-id">ABDM Facility ID</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔑</span>
+              <input type="text" class="form-input" id="abdm-id" name="abdmId" placeholder="e.g. IN-HOS-DL-001234" autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dept">Department / Role</label>
+            <div class="input-wrap">
+              <span class="input-icon">🩺</span>
+              <select class="form-select" id="dept" name="department">
+                <option value="">Select department…</option>
+                <option>Epidemiology &amp; Public Health</option>
+                <option>Emergency Medicine</option>
+                <option>Internal Medicine</option>
+                <option>Microbiology Lab</option>
+                <option>Hospital Administration</option>
+                <option>Ministry Official</option>
+                <option>CPCB Field Officer</option>
+                <option>NDMA Representative</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common Fields -->
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" class="form-input" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required />
+            <button type="button" class="eye-btn" onclick="togglePwd('password', this)" aria-label="Show/hide password">👁️</button>
+          </div>
+        </div>
+
+        <div class="forgot-row">
+          <label class="check-label">
+            <input type="checkbox" id="remember" name="remember" />
+            Remember me
+          </label>
+          <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <div class="spinner"></div>
+          <span class="btn-text" id="btn-text">Sign In</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+        <!-- Demo credentials -->
+        <div class="demo-box">
+          <div class="demo-box-title">🧪 Demo Credentials</div>
+          <div class="demo-row"><span>👤 Citizen</span> <strong onclick="fillDemo('demo@citizen.in','citizen123')">demo@citizen.in / citizen123</strong></div>
+          <div class="demo-row" style="border-top:1px dashed var(--border);margin-top:6px;padding-top:6px;"><span>🛡️ Officer</span> <strong onclick="fillDemo('officer@cpcb.in','officer123')">officer@cpcb.in / officer123</strong></div>
+          <div class="demo-row" style="border-top:1px dashed var(--border);margin-top:6px;padding-top:6px;"><span>🏥 Hospital</span> <strong onclick="fillDemo('hospital@aiims.in','hospital123')">hospital@aiims.in / hospital123</strong></div>
+        </div>
+
+      </form>
+
+      <div class="register-link" style="margin-top:16px;">
+        Don't have an account? <a href="register.html" id="register-link">Create one →</a>
+      </div>
+    </div>
+
+    <div class="auth-footer">
+      © 2026 AquaGuard · Ministry of Jal Shakti · CPCB · ABDM Compliant &nbsp;·&nbsp;
+      <a href="#" style="color:var(--text-muted);text-decoration:none;">Privacy</a> &nbsp;·&nbsp;
+      <a href="#" style="color:var(--text-muted);text-decoration:none;">Terms</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentRole = 'user';
+
+  function setRole(role) {
+    currentRole = role;
+    document.getElementById('role-user').classList.toggle('active', role === 'user');
+    document.getElementById('role-officer').classList.toggle('active', role === 'officer');
+    document.getElementById('role-hospital').classList.toggle('active', role === 'hospital');
+
+    const hf  = document.getElementById('hospital-fields');
+    const hb  = document.getElementById('hospital-badge');
+    const btn = document.getElementById('submit-btn');
+    const title = document.getElementById('auth-title');
+    const sub   = document.getElementById('auth-sub');
+    const btnTxt = document.getElementById('btn-text');
+
+    // Reset all styles first
+    btn.classList.remove('hospital-btn-style', 'officer-btn-style');
+    hf.classList.remove('visible');
+    hb.classList.remove('visible');
+
+    if (role === 'hospital') {
+      hf.classList.add('visible');
+      hb.classList.add('visible');
+      btn.classList.add('hospital-btn-style');
+      title.textContent = 'Hospital Authority Login 🏥';
+      sub.textContent = 'ABDM-verified access for medical institutions';
+      btnTxt.textContent = 'Sign In as Hospital';
+    } else if (role === 'officer') {
+      btn.classList.add('officer-btn-style');
+      title.textContent = 'Health / CPCB Officer Login 🛡️';
+      sub.textContent = 'Official access for health officers & ministry staff';
+      btnTxt.textContent = 'Sign In as Officer';
+    } else {
+      title.textContent = 'Welcome Back 👋';
+      sub.textContent = 'Sign in to access the AquaGuard dashboard';
+      btnTxt.textContent = 'Sign In';
+    }
+    clearMsg();
+  }
+
+  // Set citizen active by default
+  setRole('user');
+
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+  }
+
+  function showMsg(type, text) {
+    const el = document.getElementById('auth-msg');
+    el.textContent = (type === 'error' ? '⚠️ ' : '✅ ') + text;
+    el.className = 'auth-msg ' + type;
+  }
+
+  function clearMsg() {
+    const el = document.getElementById('auth-msg');
+    el.className = 'auth-msg';
+    el.textContent = '';
+  }
+
+  function fillDemo(email, pwd) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = pwd;
+    if (email.includes('hospital'))        setRole('hospital');
+    else if (email.includes('cpcb') || email.includes('officer')) setRole('officer');
+    else                                   setRole('user');
+    clearMsg();
+  }
+
+  // Demo users — three distinct roles
+  const DEMO_USERS = {
+    'demo@citizen.in':      { password: 'citizen123',  role: 'user',     name: 'Demo Citizen',      redirect: 'index.html' },
+    'officer@cpcb.in':      { password: 'officer123',  role: 'officer',  name: 'CPCB Field Officer', redirect: 'index.html' },
+    'hospital@aiims.in':    { password: 'hospital123', role: 'hospital', name: 'AIIMS New Delhi',    redirect: 'index.html' },
+    'nandani@aquaguard.in': { password: 'admin123',    role: 'officer',  name: 'Nandani Shukla',    redirect: 'index.html' },
+  };
+
+  function handleLogin(e) {
+    e.preventDefault();
+    clearMsg();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('submit-btn');
+
+    if (!email || !password) { showMsg('error', 'Please fill in all required fields.'); return; }
+
+    btn.classList.add('loading');
+    document.getElementById('btn-text').textContent = 'Signing in…';
+
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      const btnLabels = { user: 'Sign In', officer: 'Sign In as Officer', hospital: 'Sign In as Hospital' };
+      document.getElementById('btn-text').textContent = btnLabels[currentRole] || 'Sign In';
+
+      const user = DEMO_USERS[email];
+      if (!user) { showMsg('error', 'No account found with this email address.'); return; }
+      if (user.password !== password) { showMsg('error', 'Incorrect password. Please try again.'); return; }
+      if (user.role !== currentRole) {
+        const roleNames = { user: 'Citizen', officer: 'Health Officer', hospital: 'Hospital Authority' };
+        showMsg('error', `This account is registered as "${roleNames[user.role] || user.role}". Please select the correct role tab.`);
+        return;
+      }
+
+      // Save session with the correct role
+      sessionStorage.setItem('aq_user', JSON.stringify({ email, name: user.name, role: currentRole }));
+
+      showMsg('success', `Welcome, ${user.name}! Redirecting to your dashboard…`);
+      btn.textContent = '✅ Signed In!';
+      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+
+      setTimeout(() => { window.location.href = user.redirect; }, 1200);
+    }, 1600);
+  }
+</script>
+</body>
+</html>
+
+</body>
+</html>

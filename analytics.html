@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Analytics — AquaGuard</title>
+  <meta name="description" content="Machine learning model performance, feature importance, and 7-day outbreak predictions for waterborne disease detection." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .analytics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .analytics-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    .metric-big { text-align:center; padding:28px 20px; }
+    .mb-val { font-family:'Outfit',sans-serif; font-size:48px; font-weight:800; line-height:1; letter-spacing:-2px; }
+    .mb-label { font-size:13px; font-weight:600; color:var(--text-muted); margin-top:8px; }
+    .mb-sub { font-size:11.5px; color:var(--text-muted); margin-top:4px; }
+    .feature-item { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--border); }
+    .feature-item:last-child { border-bottom:none; }
+    .fi-rank { font-size:11px; font-weight:700; color:var(--text-muted); width:20px; text-align:center; }
+    .fi-name { font-size:13px; font-weight:600; color:var(--text-primary); width:120px; flex-shrink:0; }
+    .fi-bar-wrap { flex:1; height:8px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+    .fi-bar { height:100%; border-radius:99px; }
+    .fi-pct { font-size:12px; font-weight:700; color:var(--text-secondary); width:36px; text-align:right; }
+    .confusion-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; padding:20px; }
+    .cg-cell { padding:16px; text-align:center; border-radius:8px; }
+    .cg-val { font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; }
+    .cg-label { font-size:11px; color:var(--text-muted); margin-top:4px; }
+    .risk-zone-table { width:100%; border-collapse:collapse; }
+    .rzt th { background:var(--bg2); padding:10px 20px; text-align:left; font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; border-bottom:1.5px solid var(--border); }
+    .rzt td { padding:12px 20px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary); }
+    .rzt tr:last-child td { border-bottom:none; }
+    .rzt tr:hover td { background:var(--bg2); }
+    .prob-bar-wrap { display:flex; align-items:center; gap:8px; }
+    .prob-bar-bg { flex:1; height:7px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+    .prob-fill { height:100%; border-radius:99px; }
+    .chart-v { padding:20px 22px; height:280px; }
+    .model-info-band { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .mib-cell { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; }
+    .mib-key { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+    .mib-val { font-size:15px; font-weight:700; color:var(--text-primary); }
+    @media(max-width:900px){.analytics-grid{grid-template-columns:1fr;}.analytics-grid-3{grid-template-columns:1fr 1fr;}.model-info-band{grid-template-columns:repeat(3,1fr);}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg></div><span class="logo-text">AquaGuard</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item active"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-btn" onclick="toggleSidebar()">☰</button><div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">ML Analytics</span></div></div>
+      <div class="topbar-right"><div class="realtime-chip"><span class="pulse-dot"></span><span>Model Active</span></div><div class="date-chip" id="live-date"></div></div>
+    </header>
+
+    <div class="page-body">
+      <div class="hero-section" style="background:linear-gradient(135deg,#f5f3ff,#eff6ff,#f0fdf4);">
+        <div class="hero-text">
+          <h1 class="hero-title">🧬 ML Analytics — Outbreak Prediction</h1>
+          <p class="hero-sub">Random Forest supervised learning model trained on 5 years of CPCB water quality data + ABDM case records. Predicts waterborne disease outbreaks 3–7 days in advance.</p>
+        </div>
+        <div class="hero-status-strip">
+          <div class="status-item status-safe"><span class="s-icon">🎯</span><div><div class="s-val">94.7%</div><div class="s-lbl">Accuracy</div></div></div>
+          <div class="status-item status-neutral"><span class="s-icon">🔮</span><div><div class="s-val">9</div><div class="s-lbl">Active Predictions</div></div></div>
+          <div class="status-item status-warn"><span class="s-icon">⏱️</span><div><div class="s-val">3.4d</div><div class="s-lbl">Avg Lead Time</div></div></div>
+        </div>
+      </div>
+
+      <!-- Model Info Band -->
+      <div class="model-info-band">
+        <div class="mib-cell"><div class="mib-key">Algorithm</div><div class="mib-val">Random Forest</div></div>
+        <div class="mib-cell"><div class="mib-key">Features</div><div class="mib-val">22 parameters</div></div>
+        <div class="mib-cell"><div class="mib-key">Training Data</div><div class="mib-val">5 years · 1,240 stations</div></div>
+        <div class="mib-cell"><div class="mib-key">Last Retrained</div><div class="mib-val">2 hours ago</div></div>
+        <div class="mib-cell"><div class="mib-key">Prediction Window</div><div class="mib-val">7 days forward</div></div>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="analytics-grid-3">
+        <div class="card"><div class="metric-big"><div class="mb-val" style="color:#16a34a">94.7%</div><div class="mb-label">Model Accuracy</div><div class="mb-sub">On 20% held-out test set</div></div></div>
+        <div class="card"><div class="metric-big"><div class="mb-val" style="color:var(--blue-600)">0.921</div><div class="mb-label">F1 Score</div><div class="mb-sub">Weighted average across classes</div></div></div>
+        <div class="card"><div class="metric-big"><div class="mb-val" style="color:#a855f7">0.982</div><div class="mb-label">AUC-ROC</div><div class="mb-sub">Area under ROC curve</div></div></div>
+      </div>
+
+      <!-- Feature Importance + Confusion Matrix -->
+      <div class="analytics-grid">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">🔬 Feature Importance (XAI)</div><div class="card-sub">Top predictors for outbreak detection</div></div></div>
+          <div>
+            <div class="feature-item"><span class="fi-rank">1</span><span class="fi-name">Total Coliform</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:88%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><span class="fi-pct">88%</span></div>
+            <div class="feature-item"><span class="fi-rank">2</span><span class="fi-name">Turbidity</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:76%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div></div><span class="fi-pct">76%</span></div>
+            <div class="feature-item"><span class="fi-rank">3</span><span class="fi-name">pH Level</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:64%;background:linear-gradient(90deg,#f59e0b,#eab308)"></div></div><span class="fi-pct">64%</span></div>
+            <div class="feature-item"><span class="fi-rank">4</span><span class="fi-name">BOD</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:58%;background:linear-gradient(90deg,#3b82f6,#06b6d4)"></div></div><span class="fi-pct">58%</span></div>
+            <div class="feature-item"><span class="fi-rank">5</span><span class="fi-name">Dissolved O2</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:52%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div></div><span class="fi-pct">52%</span></div>
+            <div class="feature-item"><span class="fi-rank">6</span><span class="fi-name">Nitrates</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:44%;background:linear-gradient(90deg,#14b8a6,#06b6d4)"></div></div><span class="fi-pct">44%</span></div>
+            <div class="feature-item"><span class="fi-rank">7</span><span class="fi-name">TDS</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:38%;background:linear-gradient(90deg,#22c55e,#14b8a6)"></div></div><span class="fi-pct">38%</span></div>
+            <div class="feature-item"><span class="fi-rank">8</span><span class="fi-name">ABDM Cases</span><div class="fi-bar-wrap"><div class="fi-bar" style="width:72%;background:linear-gradient(90deg,#ec4899,#8b5cf6)"></div></div><span class="fi-pct">72%</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">📊 Confusion Matrix</div><div class="card-sub">Model classification performance</div></div></div>
+          <div class="confusion-grid">
+            <div class="cg-cell" style="background:#dcfce7;"><div class="cg-val" style="color:#16a34a">1,842</div><div class="cg-label">True Positive</div></div>
+            <div class="cg-cell" style="background:#fee2e2;"><div class="cg-val" style="color:#dc2626">98</div><div class="cg-label">False Positive</div></div>
+            <div class="cg-cell" style="background:#fef3c7;"><div class="cg-val" style="color:#d97706">112</div><div class="cg-label">False Negative</div></div>
+            <div class="cg-cell" style="background:#dcfce7;"><div class="cg-val" style="color:#16a34a">4,201</div><div class="cg-label">True Negative</div></div>
+          </div>
+          <div style="padding:16px 20px;border-top:1px solid var(--border);">
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">Class Performance</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#16a34a;font-family:'Outfit',sans-serif;">95.0%</div><div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Precision</div></div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--blue-600);font-family:'Outfit',sans-serif;">94.3%</div><div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Recall</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prediction Chart -->
+      <div class="analytics-grid">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">📈 7-Day Outbreak Probability Forecast</div><div class="card-sub">Per disease · Confidence intervals shown</div></div></div>
+          <div class="chart-v"><canvas id="forecastChart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">🔮 Zone Predictions (Next 7 Days)</div><div class="card-sub">Zones with highest ML-predicted outbreak probability</div></div></div>
+          <div style="overflow-x:auto;">
+            <table class="risk-zone-table rzt">
+              <thead><tr><th>Zone</th><th>State</th><th>Disease</th><th>Probability</th><th>Lead (days)</th></tr></thead>
+              <tbody>
+                <tr><td>Varanasi</td><td>UP</td><td>Cholera</td><td><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-fill" style="width:91%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><span style="font-size:12px;font-weight:700;color:#dc2626;">91%</span></div></td><td>2d</td></tr>
+                <tr><td>Patna</td><td>BR</td><td>Typhoid</td><td><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-fill" style="width:78%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div></div><span style="font-size:12px;font-weight:700;color:#c2410c;">78%</span></div></td><td>3d</td></tr>
+                <tr><td>Kolkata East</td><td>WB</td><td>Hepatitis A</td><td><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-fill" style="width:65%;background:linear-gradient(90deg,#f59e0b,#eab308)"></div></div><span style="font-size:12px;font-weight:700;color:#d97706;">65%</span></div></td><td>4d</td></tr>
+                <tr><td>Surat</td><td>GJ</td><td>Dysentery</td><td><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-fill" style="width:54%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div></div><span style="font-size:12px;font-weight:700;color:#7c3aed;">54%</span></div></td><td>5d</td></tr>
+                <tr><td>Delhi NCR</td><td>NCT</td><td>Gastroenteritis</td><td><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-fill" style="width:42%;background:linear-gradient(90deg,#3b82f6,#06b6d4)"></div></div><span style="font-size:12px;font-weight:700;color:var(--blue-600);">42%</span></div></td><td>6d</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const fcCtx = document.getElementById('forecastChart');
+    if(fcCtx){
+      new Chart(fcCtx,{
+        type:'bar',
+        data:{
+          labels:['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'],
+          datasets:[
+            {label:'Cholera',data:[72,85,91,88,80,72,65],backgroundColor:'rgba(239,68,68,0.75)',borderColor:'#ef4444',borderWidth:1.5,borderRadius:6},
+            {label:'Typhoid',data:[54,62,70,78,74,65,55],backgroundColor:'rgba(249,115,22,0.7)',borderColor:'#f97316',borderWidth:1.5,borderRadius:6},
+            {label:'Hepatitis A',data:[38,44,52,60,65,58,50],backgroundColor:'rgba(245,158,11,0.7)',borderColor:'#f59e0b',borderWidth:1.5,borderRadius:6},
+            {label:'Dysentery',data:[28,35,42,48,54,50,44],backgroundColor:'rgba(139,92,246,0.7)',borderColor:'#8b5cf6',borderWidth:1.5,borderRadius:6}
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,position:'top',labels:{color:'#475569',font:{size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1e293b',titleColor:'#94a3b8',bodyColor:'#f1f5f9',padding:12,cornerRadius:10}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}},y:{grid:{color:'#f1f5f9',borderDash:[4,4]},ticks:{color:'#94a3b8',font:{size:11}},title:{display:true,text:'Probability (%)',color:'#94a3b8',font:{size:11}},max:100}}}
+      });
+    }
+  </script>
+</body>
+</html>

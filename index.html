@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaGuard — Dashboard</title>
+  <meta name="description" content="AquaGuard role-based dashboard for citizens, health officers and hospital authorities." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Role Dashboard Visibility ── */
+    .role-dashboard { display: none; }
+    .role-dashboard.active { display: block; }
+
+    /* ── Role Banner ── */
+    .role-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1.5px solid;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .role-banner.citizen  { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+    .role-banner.officer  { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+    .role-banner.hospital { background: #faf5ff; border-color: #d8b4fe; color: #7e22ce; }
+    .role-banner-icon { font-size: 24px; }
+    .role-banner-text { flex: 1; }
+    .role-banner-badge {
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+    }
+    .citizen  .role-banner-badge { background: #1d4ed8; color: white; }
+    .officer  .role-banner-badge { background: #15803d; color: white; }
+    .hospital .role-banner-badge { background: #7e22ce; color: white; }
+
+    /* ── Citizen Dashboard ── */
+    .citizen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .citizen-grid { grid-template-columns: 1fr; } }
+
+    .safety-tip-card {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .safety-tip-card .st-title { font-size: 14px; font-weight: 700; color: #1e40af; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .tip-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(59,130,246,0.12); font-size: 13px; color: #334155; line-height: 1.5; }
+    .tip-item:last-child { border-bottom: none; }
+    .tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .citizen-report-card {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .cr-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .cr-form-row { display: flex; flex-direction: column; gap: 10px; }
+    .cr-input {
+      width: 100%; padding: 9px 13px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      color: #0f172a; outline: none;
+      transition: border-color 0.2s;
+      background: #f8fafc;
+    }
+    .cr-input:focus { border-color: #60a5fa; background: white; }
+    .cr-btn {
+      padding: 10px 16px; border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: white; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .cr-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
+
+    .citizen-local-alerts {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .citizen-water-status {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .citizen-water-status { grid-template-columns: 1fr 1fr; } }
+    .cws-card {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+    .cws-icon { font-size: 24px; margin-bottom: 6px; }
+    .cws-val { font-size: 22px; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; }
+    .cws-label { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
+    .cws-status { font-size: 11px; font-weight: 700; margin-top: 6px; padding: 3px 8px; border-radius: 99px; display: inline-block; }
+    .cws-safe { background: #dcfce7; color: #16a34a; }
+    .cws-warn { background: #fef9c3; color: #ca8a04; }
+    .cws-bad  { background: #fee2e2; color: #dc2626; }
+
+    /* ── Officer Dashboard ── */
+    .officer-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .officer-kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .officer-mid-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .officer-mid-row { grid-template-columns: 1fr; } }
+
+    .officer-bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .officer-bottom-row { grid-template-columns: 1fr; } }
+
+    .dispatch-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+    }
+    .dispatch-item:last-child { border-bottom: none; }
+    .di-badge {
+      padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .di-critical { background: #fee2e2; color: #dc2626; }
+    .di-warning  { background: #fef3c7; color: #d97706; }
+    .di-ok       { background: #dcfce7; color: #16a34a; }
+    .di-info     { background: #eff6ff; color: #2563eb; }
+
+    .send-alert-form { display: flex; flex-direction: column; gap: 12px; }
+    .sa-select, .sa-input {
+      width: 100%; padding: 9px 13px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      color: #0f172a; outline: none; background: #f8fafc;
+      transition: border-color 0.2s;
+    }
+    .sa-select:focus, .sa-input:focus { border-color: #60a5fa; background: white; }
+    .sa-btn {
+      padding: 10px; border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: white; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .sa-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(239,68,68,0.35); }
+
+    /* ── Hospital Dashboard ── */
+    .hospital-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .hospital-kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .hosp-mid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .hosp-mid-row { grid-template-columns: 1fr; } }
+
+    .hosp-kpi { background: white; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 18px; }
+    .hosp-kpi-icon { font-size: 26px; margin-bottom: 8px; }
+    .hosp-kpi-val { font-size: 28px; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; }
+    .hosp-kpi-label { font-size: 12px; color: #64748b; font-weight: 600; margin-top: 2px; }
+    .hosp-kpi-trend { font-size: 11px; font-weight: 700; margin-top: 6px; }
+    .hosp-kpi-trend.up   { color: #ef4444; }
+    .hosp-kpi-trend.down { color: #22c55e; }
+    .hosp-kpi-trend.neutral { color: #64748b; }
+
+    .abdm-feed { display: flex; flex-direction: column; gap: 10px; }
+    .abdm-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; background: #f8fafc;
+      border-radius: 10px; border: 1px solid #e2e8f0;
+      font-size: 13px;
+    }
+    .abdm-icon { font-size: 18px; }
+    .abdm-name { font-weight: 600; color: #0f172a; flex: 1; }
+    .abdm-disease { font-size: 11px; color: #64748b; }
+    .abdm-status-chip { padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .abdm-admitted { background: #fef3c7; color: #d97706; }
+    .abdm-critical { background: #fee2e2; color: #dc2626; }
+    .abdm-stable   { background: #dcfce7; color: #16a34a; }
+
+    .bed-capacity-section { }
+    .bed-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+    .bed-row:last-child { border-bottom: none; }
+    .bed-ward { font-weight: 600; color: #0f172a; flex: 1.5; }
+    .bed-bar-wrap { flex: 2; height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+    .bed-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+    .bed-stat { font-size: 11px; color: #64748b; font-weight: 600; flex: 0.8; text-align: right; }
+    .bed-full  { background: #ef4444; }
+    .bed-high  { background: #f97316; }
+    .bed-med   { background: #f59e0b; }
+    .bed-low   { background: #22c55e; }
+
+    .outbreak-zone-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .outbreak-zone-table th { text-align: left; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 12px; }
+    .outbreak-zone-table td { padding: 10px 12px; border-top: 1px solid #f1f5f9; color: #334155; }
+    .oz-chip { padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+
+    /* Action button rows */
+    .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .action-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 99px;
+      font-size: 12.5px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .action-chip:hover { transform: translateY(-1px); }
+    .chip-blue   { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+    .chip-green  { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+    .chip-purple { background: #faf5ff; border-color: #d8b4fe; color: #7e22ce; }
+    .chip-red    { background: #fff1f2; border-color: #fca5a5; color: #dc2626; }
+    .chip-orange { background: #fff7ed; border-color: #fdba74; color: #c2410c; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR NAV ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/>
+          <path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38bdf8"/>
+              <stop offset="1" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="logo-text">AquaGuard</span>
+    </div>
+
+    <!-- Nav items rendered by JS based on role -->
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <a href="index.html" class="nav-item active" id="nav-dashboard">
+        <span class="nav-icon">⊞</span>
+        <span>Dashboard</span>
+      </a>
+      <!-- role-specific nav items injected by JS -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar">NS</div>
+        <div class="user-info">
+          <div class="user-name">Nandani Shukla</div>
+          <div class="user-role">Health Officer</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()" id="btn-logout" aria-label="Sign out">
+        🚪 Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()" id="menu-btn" aria-label="Toggle menu">☰</button>
+        <div class="breadcrumb">
+          <span class="bc-home">Home</span>
+          <span class="bc-sep">›</span>
+          <span class="bc-current" id="bc-current">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="realtime-chip">
+          <span class="pulse-dot"></span>
+          <span>Live Monitoring</span>
+        </div>
+        <div class="date-chip" id="live-date"></div>
+        <button class="alert-btn" onclick="window.location.href='alerts.html'" aria-label="View alerts">
+          🔔
+          <span class="alert-count">3</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           CITIZEN DASHBOARD
+           ════════════════════════════════════════ -->
+      <div class="role-dashboard" id="dashboard-citizen">
+
+        <!-- Banner -->
+        <div class="role-banner citizen">
+          <span class="role-banner-icon">👤</span>
+          <div class="role-banner-text">
+            <strong>Citizen Portal</strong> — Check local water safety, submit issue reports, and view community alerts in your area.
+          </div>
+          <span class="role-banner-badge">CITIZEN</span>
+        </div>
+
+        <!-- Local Water Quality Status -->
+        <div class="citizen-water-status">
+          <div class="cws-card">
+            <div class="cws-icon">⚗️</div>
+            <div class="cws-val">7.4</div>
+            <div class="cws-label">pH Level</div>
+            <span class="cws-status cws-safe">✅ Safe</span>
+          </div>
+          <div class="cws-card">
+            <div class="cws-icon">🌊</div>
+            <div class="cws-val">1.2</div>
+            <div class="cws-label">Turbidity (NTU)</div>
+            <span class="cws-status cws-warn">⚠ Watch</span>
+          </div>
+          <div class="cws-card">
+            <div class="cws-icon">🧂</div>
+            <div class="cws-val">312</div>
+            <div class="cws-label">TDS mg/L</div>
+            <span class="cws-status cws-safe">✅ Safe</span>
+          </div>
+          <div class="cws-card">
+            <div class="cws-icon">🌡️</div>
+            <div class="cws-val">27°C</div>
+            <div class="cws-label">Water Temp</div>
+            <span class="cws-status cws-safe">✅ Normal</span>
+          </div>
+        </div>
+
+        <!-- Two Column: Alerts + Report Form -->
+        <div class="citizen-grid">
+
+          <!-- Local Alerts Card -->
+          <div class="card alerts-card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">🔔 Alerts Near You</div>
+                <div class="card-sub">Active water quality warnings in your region</div>
+              </div>
+              <a href="alerts.html" class="view-all-btn">View All →</a>
+            </div>
+            <div class="alerts-list">
+              <div class="alert-item alert-warning">
+                <div class="alert-left">
+                  <span class="al-icon">⚠️</span>
+                  <div>
+                    <div class="al-title">Turbidity Spike — Sector 4</div>
+                    <div class="al-meta">NTU: 12.4 (threshold: 5) · Boil before drinking</div>
+                  </div>
+                </div>
+                <div class="al-time">4h ago</div>
+              </div>
+              <div class="alert-item alert-critical">
+                <div class="alert-left">
+                  <span class="al-icon">🚨</span>
+                  <div>
+                    <div class="al-title">Cholera Risk — Varanasi</div>
+                    <div class="al-meta">Coliform > 500 CFU/mL · Avoid tap water</div>
+                  </div>
+                </div>
+                <div class="al-time">2h ago</div>
+              </div>
+              <div class="alert-item alert-info">
+                <div class="alert-left">
+                  <span class="al-icon">ℹ️</span>
+                  <div>
+                    <div class="al-title">Tanker Schedule — Ward 7</div>
+                    <div class="al-meta">Municipal tanker delivery: 8AM–10AM tomorrow</div>
+                  </div>
+                </div>
+                <div class="al-time">1h ago</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Issue -->
+          <div class="card citizen-report-card">
+            <div class="cr-title">📝 Report a Water Issue</div>
+            <div class="cr-form-row">
+              <select class="cr-input">
+                <option value="">Select Issue Type…</option>
+                <option>Foul smell / color change</option>
+                <option>Low / no water pressure</option>
+                <option>Pipe leakage observed</option>
+                <option>Suspected contamination</option>
+                <option>Multiple sick after drinking</option>
+                <option>Other</option>
+              </select>
+              <input type="text" class="cr-input" placeholder="📍 Your locality / area" />
+              <textarea class="cr-input" rows="3" placeholder="Describe the problem (optional)…" style="resize:none;"></textarea>
+              <button class="cr-btn" onclick="submitCitizenReport()">+ Submit Report</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Community Feed -->
+        <div class="card community-card" style="margin-bottom:24px;">
+          <div class="card-head">
+            <div>
+              <div class="card-title">👥 Community Reports Near You</div>
+              <div class="card-sub">Citizen-submitted field reports from your region</div>
+            </div>
+            <a href="community.html" class="view-all-btn">View All →</a>
+          </div>
+          <div class="community-feed">
+            <div class="cf-item">
+              <div class="cf-avatar cf-av1">RK</div>
+              <div class="cf-body">
+                <div class="cf-author">Rajesh Kumar <span class="cf-tag tag-verified">✓ Verified</span></div>
+                <div class="cf-text">"Foul smell from tap water in Sector 4 for 3 days. Multiple families sick."</div>
+                <div class="cf-footer">
+                  <span class="cf-loc">📍 Noida, UP</span>
+                  <span class="cf-time">1h ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="cf-item">
+              <div class="cf-avatar cf-av2">PD</div>
+              <div class="cf-body">
+                <div class="cf-author">Priya Desai <span class="cf-tag tag-urgent">🔴 Urgent</span></div>
+                <div class="cf-text">"Children developed diarrhea after drinking well water in our locality."</div>
+                <div class="cf-footer">
+                  <span class="cf-loc">📍 Surat, GJ</span>
+                  <span class="cf-time">3h ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Safety Tips -->
+        <div class="safety-tip-card" style="margin-bottom:24px;">
+          <div class="st-title">💡 Water Safety Tips for Citizens</div>
+          <div class="tip-item"><span class="tip-icon">🫧</span><span>Always boil tap water for at least 1 minute before drinking if you see turbidity alerts in your area.</span></div>
+          <div class="tip-item"><span class="tip-icon">🤒</span><span>If multiple family members develop diarrhea, vomiting, or fever — report immediately and visit your nearest health center.</span></div>
+          <div class="tip-item"><span class="tip-icon">🧪</span><span>Water that looks clear can still be contaminated. Trust the CPCB quality readings, not just appearance.</span></div>
+          <div class="tip-item"><span class="tip-icon">📱</span><span>Use this platform to report issues. Your report triggers field inspection within 12–24 hours.</span></div>
+        </div>
+
+        <!-- Quick Actions for Citizens -->
+        <div class="quick-actions-section">
+          <div class="qa-title">Quick Actions</div>
+          <div class="qa-grid">
+            <a href="community.html" class="qa-card" id="qa-community-citizen">
+              <span class="qa-icon">📝</span>
+              <div class="qa-label">Submit Report</div>
+              <div class="qa-sub">Report water issue</div>
+            </a>
+            <a href="alerts.html" class="qa-card" id="qa-alerts-citizen">
+              <span class="qa-icon">🔔</span>
+              <div class="qa-label">My Alerts</div>
+              <div class="qa-sub">Local notifications</div>
+            </a>
+            <a href="heatmap.html" class="qa-card" id="qa-heatmap-citizen">
+              <span class="qa-icon">🗺️</span>
+              <div class="qa-label">Risk Map</div>
+              <div class="qa-sub">View my area risk</div>
+            </a>
+            <a href="water-quality.html" class="qa-card" id="qa-water-citizen">
+              <span class="qa-icon">💧</span>
+              <div class="qa-label">Water Quality</div>
+              <div class="qa-sub">Local parameters</div>
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-citizen -->
+
+
+      <!-- ════════════════════════════════════════
+           OFFICER DASHBOARD
+           ════════════════════════════════════════ -->
+      <div class="role-dashboard" id="dashboard-officer">
+
+        <!-- Banner -->
+        <div class="role-banner officer">
+          <span class="role-banner-icon">🛡️</span>
+          <div class="role-banner-text">
+            <strong>Health Officer / CPCB Officer Portal</strong> — National CPCB monitoring, ML outbreak prediction, alert dispatch and field operations command.
+          </div>
+          <span class="role-banner-badge">OFFICER</span>
+        </div>
+
+        <!-- Officer KPI Row -->
+        <div class="officer-kpi-row" id="officer-kpi-row">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-header">
+              <span class="kpi-label">Water Quality Index</span>
+              <span class="kpi-icon-bg">💧</span>
+            </div>
+            <div class="kpi-value">72.4</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend up">▲ 2.1%</span>
+              <span class="kpi-period">vs last 7 days</span>
+            </div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:72%"></div></div>
+          </div>
+          <div class="kpi-card kpi-teal">
+            <div class="kpi-header">
+              <span class="kpi-label">Active CPCB Stations</span>
+              <span class="kpi-icon-bg">📡</span>
+            </div>
+            <div class="kpi-value">1,240</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend up">▲ 14 new</span>
+              <span class="kpi-period">since yesterday</span>
+            </div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:88%"></div></div>
+          </div>
+          <div class="kpi-card kpi-orange">
+            <div class="kpi-header">
+              <span class="kpi-label">Predicted Cases (7d)</span>
+              <span class="kpi-icon-bg">🧬</span>
+            </div>
+            <div class="kpi-value">2,381</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend down">▼ 8.3%</span>
+              <span class="kpi-period">ML model forecast</span>
+            </div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:55%"></div></div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-header">
+              <span class="kpi-label">Alerts Dispatched</span>
+              <span class="kpi-icon-bg">📤</span>
+            </div>
+            <div class="kpi-value">47</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend up">▲ 12 today</span>
+              <span class="kpi-period">ministry & hospitals</span>
+            </div>
+            <div class="kpi-bar"><div class="kpi-fill" style="width:47%"></div></div>
+          </div>
+        </div>
+
+        <!-- CPCB Live Monitoring -->
+        <section class="cpcb-status-section" id="cpcb-status-section">
+          <div class="cpcb-section-header">
+            <div class="cpcb-section-title">
+              <span class="cpcb-pulse-ring" id="cpcb-pulse-ring"></span>
+              💧 Drinking Water Supply Monitoring
+              <span class="cpcb-live-badge" id="cpcb-live-badge">● LIVE</span>
+            </div>
+            <div class="cpcb-section-meta" id="cpcb-last-sync">Monitoring tankers · WTPs · distribution points · BIS 10500 standard</div>
+            <div class="cpcb-section-actions">
+              <button class="cpcb-refresh-btn" onclick="refreshCPCBStatus()" id="btn-cpcb-refresh" aria-label="Force re-sync CPCB data">↻ Force Sync</button>
+              <a href="water-quality.html" class="cpcb-details-link">Full Water Quality →</a>
+            </div>
+          </div>
+          <div class="source-legend-strip">
+            <span class="src-label">Source types:</span>
+            <span class="src-chip">🏭 Water Treatment Plant</span>
+            <span class="src-chip">🚛 Tanker Dispatch</span>
+            <span class="src-chip">🪣 Distribution Point</span>
+            <span class="src-chip">🏗️ Overhead Tank</span>
+            <span class="src-chip">⛽ Borewell Supply</span>
+            <span class="src-chip-std">Standard: BIS 10500 · WHO DW Guidelines</span>
+          </div>
+          <div class="cpcb-sensor-row">
+            <div class="cpcb-sensor-card" id="card-ph">
+              <div class="cscard-top"><div class="cscard-icon cscard-icon-blue">⚗️</div><div class="cscard-status-dot dot-active" id="dot-ph"></div></div>
+              <div class="cscard-label">pH Sensor</div>
+              <div class="cscard-value" id="val-ph">7.4</div>
+              <div class="cscard-unit">Drinking water pH</div>
+              <div class="cscard-range">BIS 10500: 6.5 – 8.5</div>
+              <div class="cscard-footer"><span class="cscard-status-text collecting" id="status-ph">● Collecting</span><span class="cscard-freq">Every 4h</span></div>
+            </div>
+            <div class="cpcb-sensor-card" id="card-turb">
+              <div class="cscard-top"><div class="cscard-icon cscard-icon-cyan">🌊</div><div class="cscard-status-dot dot-active" id="dot-turb"></div></div>
+              <div class="cscard-label">Turbidity Sensor</div>
+              <div class="cscard-value" id="val-turb">1.2</div>
+              <div class="cscard-unit">NTU (clarity)</div>
+              <div class="cscard-range">BIS: &lt;1 NTU ideal · &lt;5 permitted</div>
+              <div class="cscard-footer"><span class="cscard-status-text collecting" id="status-turb">● Collecting</span><span class="cscard-freq">Every 4h</span></div>
+            </div>
+            <div class="cpcb-sensor-card" id="card-tds">
+              <div class="cscard-top"><div class="cscard-icon cscard-icon-teal">🧂</div><div class="cscard-status-dot dot-active" id="dot-tds"></div></div>
+              <div class="cscard-label">TDS Sensor</div>
+              <div class="cscard-value" id="val-tds">312</div>
+              <div class="cscard-unit">mg/L (dissolved solids)</div>
+              <div class="cscard-range">BIS: &lt;500 ideal · &lt;2000 permitted</div>
+              <div class="cscard-footer"><span class="cscard-status-text collecting" id="status-tds">● Collecting</span><span class="cscard-freq">Every 4h</span></div>
+            </div>
+            <div class="cpcb-sensor-card" id="card-temp">
+              <div class="cscard-top"><div class="cscard-icon cscard-icon-orange">🌡️</div><div class="cscard-status-dot dot-active" id="dot-temp"></div></div>
+              <div class="cscard-label">Temperature Sensor</div>
+              <div class="cscard-value" id="val-temp">27.4</div>
+              <div class="cscard-unit">°C (supply temp)</div>
+              <div class="cscard-range">WHO: &lt;45°C at point of use</div>
+              <div class="cscard-footer"><span class="cscard-status-text collecting" id="status-temp">● Collecting</span><span class="cscard-freq">Every 4h</span></div>
+            </div>
+          </div>
+          <div class="cpcb-pipeline-strip">
+            <div class="pipeline-step pipe-active" id="pipe-1"><div class="pipe-icon">🚛💧</div><div class="pipe-label">Tanker / WTP Sensors</div><div class="pipe-sub" id="pipe1-sub">pH · Turb · TDS · Temp</div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipeline-step pipe-active" id="pipe-2"><div class="pipe-icon">🔄</div><div class="pipe-label">CPCB Ingestion API</div><div class="pipe-sub" id="pipe2-sub">Real-time polling</div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipeline-step pipe-active" id="pipe-3"><div class="pipe-icon">📋</div><div class="pipe-label">BIS 10500 Check</div><div class="pipe-sub" id="pipe3-sub">Quality classification</div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipeline-step pipe-active" id="pipe-4"><div class="pipe-icon">🧠</div><div class="pipe-label">ML Risk Model</div><div class="pipe-sub" id="pipe4-sub">Outbreak prediction</div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipeline-step pipe-active" id="pipe-5"><div class="pipe-icon">🔔</div><div class="pipe-label">Alert Dispatch</div><div class="pipe-sub" id="pipe5-sub">Ministry · Hospitals</div></div>
+            <div class="cpcb-tx-stats" id="cpcb-tx-stats">
+              <div class="tx-stat"><div class="tx-val" id="tx-total">0</div><div class="tx-lbl">Readings Today</div></div>
+              <div class="tx-stat"><div class="tx-val tx-green" id="tx-ok">0</div><div class="tx-lbl">Within Limits</div></div>
+              <div class="tx-stat"><div class="tx-val tx-red" id="tx-anomaly">0</div><div class="tx-lbl">Anomalies</div></div>
+              <div class="tx-stat"><div class="tx-val tx-orange" id="tx-offline">0</div><div class="tx-lbl">Stations Offline</div></div>
+            </div>
+          </div>
+          <div class="cpcb-station-feed" id="cpcb-station-feed">
+            <div class="csf-header">
+              <span>Supply Point · Source</span><span>pH</span><span>Turbidity (BIS &lt;1)</span><span>TDS mg/L</span><span>Temp</span><span>WQI</span><span>DW Safety</span><span>Last Reading</span>
+            </div>
+            <div class="csf-body" id="csf-body"></div>
+          </div>
+        </section>
+
+        <!-- Officer Middle Row: Chart + Send Alert -->
+        <div class="officer-mid-row">
+          <div class="card chart-card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">14-Day Water Quality Trend</div>
+                <div class="card-sub">CPCB sensor aggregated data · National average</div>
+              </div>
+              <div class="card-actions">
+                <button class="chip-btn active" onclick="filterChart('wqi')">WQI</button>
+                <button class="chip-btn" onclick="filterChart('ph')">pH</button>
+                <button class="chip-btn" onclick="filterChart('turb')">Turbidity</button>
+              </div>
+            </div>
+            <div class="chart-container"><canvas id="wqiChart"></canvas></div>
+          </div>
+
+          <!-- Send Alert Panel -->
+          <div class="card" style="padding:20px;">
+            <div class="card-title" style="margin-bottom:6px;">📤 Dispatch Alert</div>
+            <div class="card-sub" style="margin-bottom:16px;">Send official notification to hospitals & ministry</div>
+            <div class="send-alert-form">
+              <select class="sa-select">
+                <option value="">Alert Type…</option>
+                <option>🚨 Critical — Disease Outbreak</option>
+                <option>⚠️ Warning — Water Contamination</option>
+                <option>ℹ️ Advisory — Precautionary Measure</option>
+                <option>✅ Resolved — Quality Restored</option>
+              </select>
+              <select class="sa-select">
+                <option value="">Select Region…</option>
+                <option>Uttar Pradesh — Varanasi</option>
+                <option>Bihar — Patna</option>
+                <option>West Bengal — Kolkata</option>
+                <option>Maharashtra — Mumbai</option>
+                <option>Gujarat — Surat</option>
+                <option>Delhi — East District</option>
+                <option>National (All Regions)</option>
+              </select>
+              <select class="sa-select">
+                <option value="">Notify…</option>
+                <option>Ministry of Jal Shakti</option>
+                <option>All District Hospitals</option>
+                <option>NDMA + CPCB HQ</option>
+                <option>All Recipients</option>
+              </select>
+              <textarea class="sa-input" rows="3" placeholder="Alert message / instructions…" style="resize:none;"></textarea>
+              <button class="sa-btn" onclick="dispatchAlert()">🔔 Dispatch Alert Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Officer Bottom Row: Alerts + ML -->
+        <div class="officer-bottom-row">
+          <div class="card alerts-card">
+            <div class="card-head">
+              <div><div class="card-title">Active Alerts</div><div class="card-sub">Ministry & hospital notifications</div></div>
+              <a href="alerts.html" class="view-all-btn">View All →</a>
+            </div>
+            <div class="alerts-list">
+              <div class="alert-item alert-critical">
+                <div class="alert-left"><span class="al-icon">🚨</span><div><div class="al-title">Cholera Risk — Varanasi, UP</div><div class="al-meta">Coliform >500 CFU/mL · Sent to CMO & District Hospital</div></div></div>
+                <div class="al-time">2h ago</div>
+              </div>
+              <div class="alert-item alert-warning">
+                <div class="alert-left"><span class="al-icon">⚠️</span><div><div class="al-title">Turbidity Spike — Patna, Bihar</div><div class="al-meta">NTU: 12.4 (threshold: 5) · Ministry Notified</div></div></div>
+                <div class="al-time">4h ago</div>
+              </div>
+              <div class="alert-item alert-warning">
+                <div class="alert-left"><span class="al-icon">⚠️</span><div><div class="al-title">pH Anomaly — Kolkata, WB</div><div class="al-meta">pH: 9.8 (normal: 6.5–8.5) · Hospitals alerted</div></div></div>
+                <div class="al-time">6h ago</div>
+              </div>
+              <div class="alert-item alert-info">
+                <div class="alert-left"><span class="al-icon">ℹ️</span><div><div class="al-title">DO Level Recovery — Chennai</div><div class="al-meta">Dissolved Oxygen returned to normal range</div></div></div>
+                <div class="al-time">12h ago</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card ml-card">
+            <div class="card-head">
+              <div><div class="card-title">ML Outbreak Prediction</div><div class="card-sub">Random Forest · ABDM-correlated · Last trained 2h ago</div></div>
+              <a href="analytics.html" class="view-all-btn">Full Analytics →</a>
+            </div>
+            <div class="ml-body">
+              <div class="ml-feature-grid">
+                <div class="ml-feat"><div class="mlf-icon">⚗️</div><div class="mlf-label">Input Features</div><div class="mlf-list">pH, Turbidity, DO, Coliform, TDS, BOD, Nitrates, Temp</div></div>
+                <div class="ml-feat"><div class="mlf-icon">🎯</div><div class="mlf-label">Model Accuracy</div><div class="mlf-val mlf-green">94.7%</div></div>
+                <div class="ml-feat"><div class="mlf-icon">📈</div><div class="mlf-label">F1 Score</div><div class="mlf-val mlf-blue">0.921</div></div>
+                <div class="ml-feat"><div class="mlf-icon">🔮</div><div class="mlf-label">7-Day Prediction</div><div class="mlf-val mlf-orange">High Risk · 9 zones</div></div>
+              </div>
+              <div class="ml-prediction-chart"><canvas id="mlChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Officer Quick Actions -->
+        <div class="quick-actions-section">
+          <div class="qa-title">Quick Actions</div>
+          <div class="qa-grid">
+            <a href="water-quality.html" class="qa-card" id="qa-water"><span class="qa-icon">🧪</span><div class="qa-label">CPCB Data</div><div class="qa-sub">14-day sensor feed</div></a>
+            <a href="heatmap.html" class="qa-card" id="qa-heatmap"><span class="qa-icon">🗺️</span><div class="qa-label">India Heatmap</div><div class="qa-sub">National risk map</div></a>
+            <a href="alerts.html" class="qa-card" id="qa-alerts"><span class="qa-icon">🔔</span><div class="qa-label">Alert Center</div><div class="qa-sub">Dispatch & manage</div></a>
+            <a href="analytics.html" class="qa-card" id="qa-analytics"><span class="qa-icon">📊</span><div class="qa-label">ML Analytics</div><div class="qa-sub">Model insights & XAI</div></a>
+            <a href="patients.html" class="qa-card" id="qa-patients"><span class="qa-icon">🏥</span><div class="qa-label">Patient Intel</div><div class="qa-sub">ABDM integrated data</div></a>
+            <a href="community.html" class="qa-card" id="qa-community"><span class="qa-icon">👥</span><div class="qa-label">Field Reports</div><div class="qa-sub">Citizen submissions</div></a>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-officer -->
+
+
+      <!-- ════════════════════════════════════════
+           HOSPITAL AUTHORITY DASHBOARD
+           ════════════════════════════════════════ -->
+      <div class="role-dashboard" id="dashboard-hospital">
+
+        <!-- Banner -->
+        <div class="role-banner hospital">
+          <span class="role-banner-icon">🏥</span>
+          <div class="role-banner-text">
+            <strong>Hospital Authority Portal</strong> — Patient intelligence, ABDM syndromic surveillance, bed capacity management and waterborne disease outbreak tracking.
+          </div>
+          <span class="role-banner-badge">HOSPITAL</span>
+        </div>
+
+        <!-- Hospital KPI Row -->
+        <div class="hospital-kpi-row">
+          <div class="hosp-kpi">
+            <div class="hosp-kpi-icon">🩺</div>
+            <div class="hosp-kpi-val">1,482</div>
+            <div class="hosp-kpi-label">Waterborne Cases (7d)</div>
+            <div class="hosp-kpi-trend up">▲ 214 new admissions today</div>
+          </div>
+          <div class="hosp-kpi">
+            <div class="hosp-kpi-icon">🛏️</div>
+            <div class="hosp-kpi-val">214</div>
+            <div class="hosp-kpi-label">New Admissions (24h)</div>
+            <div class="hosp-kpi-trend up">▲ +38 vs yesterday</div>
+          </div>
+          <div class="hosp-kpi">
+            <div class="hosp-kpi-icon">🚨</div>
+            <div class="hosp-kpi-val">38</div>
+            <div class="hosp-kpi-label">ICU / Critical Cases</div>
+            <div class="hosp-kpi-trend down">▼ Stabilizing</div>
+          </div>
+          <div class="hosp-kpi">
+            <div class="hosp-kpi-icon">📊</div>
+            <div class="hosp-kpi-val">9</div>
+            <div class="hosp-kpi-label">Predicted Outbreaks (7d)</div>
+            <div class="hosp-kpi-trend neutral">ML model — High confidence</div>
+          </div>
+        </div>
+
+        <!-- Hospital Middle Row: ABDM Feed + Outbreak Zones -->
+        <div class="hosp-mid-row">
+
+          <!-- ABDM Patient Feed -->
+          <div class="card" style="padding:20px;">
+            <div class="card-head" style="margin-bottom:16px;">
+              <div>
+                <div class="card-title">🩺 ABDM Patient Intelligence</div>
+                <div class="card-sub">Syndromic surveillance · Real-time admissions</div>
+              </div>
+              <a href="patients.html" class="view-all-btn">Full Records →</a>
+            </div>
+            <div class="abdm-feed">
+              <div class="abdm-row"><span class="abdm-icon">🤒</span><div><div class="abdm-name">Rakesh Singh, 42</div><div class="abdm-disease">Suspected Cholera · Varanasi, UP</div></div><span class="abdm-status-chip abdm-critical">Critical</span></div>
+              <div class="abdm-row"><span class="abdm-icon">🤒</span><div><div class="abdm-name">Sunita Devi, 28</div><div class="abdm-disease">Typhoid Fever · Patna, Bihar</div></div><span class="abdm-status-chip abdm-admitted">Admitted</span></div>
+              <div class="abdm-row"><span class="abdm-icon">👦</span><div><div class="abdm-name">Aarav Gupta, 8</div><div class="abdm-disease">Acute Diarrhea · Mumbai, MH</div></div><span class="abdm-status-chip abdm-stable">Stable</span></div>
+              <div class="abdm-row"><span class="abdm-icon">👵</span><div><div class="abdm-name">Kamla Yadav, 65</div><div class="abdm-disease">Hepatitis A · Kolkata, WB</div></div><span class="abdm-status-chip abdm-admitted">Admitted</span></div>
+              <div class="abdm-row"><span class="abdm-icon">🤒</span><div><div class="abdm-name">Mohammed Irfan, 35</div><div class="abdm-disease">Dysentery · Surat, GJ</div></div><span class="abdm-status-chip abdm-stable">Stable</span></div>
+            </div>
+          </div>
+
+          <!-- Bed Capacity -->
+          <div class="card" style="padding:20px;">
+            <div class="card-head" style="margin-bottom:16px;">
+              <div>
+                <div class="card-title">🛏️ Bed Capacity Status</div>
+                <div class="card-sub">Waterborne disease wards · Real-time occupancy</div>
+              </div>
+            </div>
+            <div class="bed-capacity-section">
+              <div class="bed-row">
+                <div class="bed-ward">Isolation Ward A</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-full" style="width:94%"></div></div>
+                <div class="bed-stat">94% · 47/50</div>
+              </div>
+              <div class="bed-row">
+                <div class="bed-ward">General Ward B</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-high" style="width:78%"></div></div>
+                <div class="bed-stat">78% · 62/80</div>
+              </div>
+              <div class="bed-row">
+                <div class="bed-ward">Paediatrics</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-high" style="width:71%"></div></div>
+                <div class="bed-stat">71% · 36/50</div>
+              </div>
+              <div class="bed-row">
+                <div class="bed-ward">ICU / HDU</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-full" style="width:86%"></div></div>
+                <div class="bed-stat">86% · 17/20</div>
+              </div>
+              <div class="bed-row">
+                <div class="bed-ward">OPD / Day Care</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-med" style="width:55%"></div></div>
+                <div class="bed-stat">55% · 22/40</div>
+              </div>
+              <div class="bed-row">
+                <div class="bed-ward">Recovery Ward C</div>
+                <div class="bed-bar-wrap"><div class="bed-fill bed-low" style="width:38%"></div></div>
+                <div class="bed-stat">38% · 19/50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disease Breakdown + Outbreak Zones -->
+        <div class="hosp-mid-row">
+          <!-- Disease Chart -->
+          <div class="card patients-card" style="padding:20px;">
+            <div class="card-head" style="margin-bottom:16px;">
+              <div><div class="card-title">📊 Disease Breakdown</div><div class="card-sub">Top predicted waterborne diseases · 7-day forecast</div></div>
+            </div>
+            <div class="disease-breakdown">
+              <div class="db-title">Cases by Disease</div>
+              <div class="db-item"><span class="db-name">Cholera</span><div class="db-bar-wrap"><div class="db-bar db-red" style="width:72%"></div></div><span class="db-pct">72%</span></div>
+              <div class="db-item"><span class="db-name">Typhoid</span><div class="db-bar-wrap"><div class="db-bar db-orange" style="width:54%"></div></div><span class="db-pct">54%</span></div>
+              <div class="db-item"><span class="db-name">Hepatitis A</span><div class="db-bar-wrap"><div class="db-bar db-yellow" style="width:38%"></div></div><span class="db-pct">38%</span></div>
+              <div class="db-item"><span class="db-name">Dysentery</span><div class="db-bar-wrap"><div class="db-bar db-blue" style="width:28%"></div></div><span class="db-pct">28%</span></div>
+              <div class="db-item"><span class="db-name">Leptospirosis</span><div class="db-bar-wrap"><div class="db-bar db-teal" style="width:14%"></div></div><span class="db-pct">14%</span></div>
+            </div>
+            <div style="margin-top:16px;">
+              <canvas id="hospDiseaseChart" style="max-height:160px;"></canvas>
+            </div>
+          </div>
+
+          <!-- Outbreak Zone Table -->
+          <div class="card" style="padding:20px;">
+            <div class="card-head" style="margin-bottom:16px;">
+              <div><div class="card-title">🗺️ Outbreak Zones</div><div class="card-sub">ML-flagged high risk areas — refer or mobilize</div></div>
+              <a href="heatmap.html" class="view-all-btn">Open Map →</a>
+            </div>
+            <table class="outbreak-zone-table">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th>Disease</th>
+                  <th>Cases</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Varanasi, UP</td>
+                  <td>Cholera</td>
+                  <td>342</td>
+                  <td><span class="oz-chip" style="background:#fee2e2;color:#dc2626;font-weight:700;">Critical</span></td>
+                </tr>
+                <tr>
+                  <td>Patna, Bihar</td>
+                  <td>Typhoid</td>
+                  <td>218</td>
+                  <td><span class="oz-chip" style="background:#fef3c7;color:#d97706;font-weight:700;">High</span></td>
+                </tr>
+                <tr>
+                  <td>Kolkata, WB</td>
+                  <td>Hepatitis A</td>
+                  <td>184</td>
+                  <td><span class="oz-chip" style="background:#fef3c7;color:#d97706;font-weight:700;">High</span></td>
+                </tr>
+                <tr>
+                  <td>Surat, GJ</td>
+                  <td>Dysentery</td>
+                  <td>143</td>
+                  <td><span class="oz-chip" style="background:#fef9c3;color:#ca8a04;font-weight:700;">Moderate</span></td>
+                </tr>
+                <tr>
+                  <td>Bhopal, MP</td>
+                  <td>Typhoid</td>
+                  <td>97</td>
+                  <td><span class="oz-chip" style="background:#fef9c3;color:#ca8a04;font-weight:700;">Moderate</span></td>
+                </tr>
+                <tr>
+                  <td>Mumbai, MH</td>
+                  <td>Leptospirosis</td>
+                  <td>62</td>
+                  <td><span class="oz-chip" style="background:#f0fdf4;color:#16a34a;font-weight:700;">Watch</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Hospital Alerts -->
+        <div class="card alerts-card" style="margin-bottom:24px;">
+          <div class="card-head">
+            <div><div class="card-title">🚨 Outbreak Alerts — Your Hospital</div><div class="card-sub">Notifications requiring immediate clinical action</div></div>
+            <a href="alerts.html" class="view-all-btn">Manage Alerts →</a>
+          </div>
+          <div class="alerts-list">
+            <div class="alert-item alert-critical">
+              <div class="alert-left"><span class="al-icon">🚨</span><div><div class="al-title">Emergency — Cholera Outbreak Surge · Varanasi</div><div class="al-meta">Prepare isolation beds · Coordinate with CMO · ORS & IV fluids needed</div></div></div>
+              <div class="al-time">2h ago</div>
+            </div>
+            <div class="alert-item alert-warning">
+              <div class="alert-left"><span class="al-icon">⚠️</span><div><div class="al-title">NDMA Advisory — Flood-related contamination risk</div><div class="al-meta">Bihar corridor — enhance surveillance for cholera and typhoid</div></div></div>
+              <div class="al-time">5h ago</div>
+            </div>
+            <div class="alert-item alert-info">
+              <div class="alert-left"><span class="al-icon">ℹ️</span><div><div class="al-title">ABDM Data Sync Complete</div><div class="al-meta">3,400 hospital records updated · Latest syndromic data available</div></div></div>
+              <div class="al-time">8h ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hospital Quick Actions -->
+        <div class="quick-actions-section">
+          <div class="qa-title">Quick Actions</div>
+          <div class="qa-grid">
+            <a href="patients.html" class="qa-card" id="qa-patients-hosp"><span class="qa-icon">🩺</span><div class="qa-label">Patient Records</div><div class="qa-sub">ABDM integrated data</div></a>
+            <a href="alerts.html" class="qa-card" id="qa-alerts-hosp"><span class="qa-icon">🚨</span><div class="qa-label">Outbreak Alerts</div><div class="qa-sub">Active notifications</div></a>
+            <a href="analytics.html" class="qa-card" id="qa-analytics-hosp"><span class="qa-icon">📊</span><div class="qa-label">ML Outbreak Forecast</div><div class="qa-sub">7-day predictions</div></a>
+            <a href="heatmap.html" class="qa-card" id="qa-heatmap-hosp"><span class="qa-icon">🗺️</span><div class="qa-label">Risk Heatmap</div><div class="qa-sub">Outbreak zones</div></a>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-hospital -->
+
+    </div><!-- /page-body -->
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // ── Role-based Dashboard Init ──
+    function initRoleDashboard() {
+      const raw = sessionStorage.getItem('aq_user');
+      let role = 'officer'; // default fallback
+      if (raw) {
+        try { role = JSON.parse(raw).role || 'officer'; } catch(e) {}
+      }
+
+      // Map roles
+      const dashMap = {
+        user:     'dashboard-citizen',
+        citizen:  'dashboard-citizen',
+        officer:  'dashboard-officer',
+        hospital: 'dashboard-hospital',
+      };
+      const dashId = dashMap[role] || 'dashboard-officer';
+
+      // Show the right dashboard
+      document.querySelectorAll('.role-dashboard').forEach(d => d.classList.remove('active'));
+      const target = document.getElementById(dashId);
+      if (target) target.classList.add('active');
+
+      // Update sidebar nav links per role
+      const navEl = document.getElementById('sidebar-nav');
+      const navItems = {
+        citizen: `
+          <a href="index.html" class="nav-item active"><span class="nav-icon">⊞</span><span>My Dashboard</span></a>
+          <a href="community.html" class="nav-item"><span class="nav-icon">📝</span><span>Submit Report</span></a>
+          <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>My Alerts</span></a>
+          <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>Risk Map</span></a>
+          <a href="water-quality.html" class="nav-item"><span class="nav-icon">💧</span><span>Water Quality</span></a>
+        `,
+        officer: `
+          <a href="index.html" class="nav-item active"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+          <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+          <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+          <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+          <a href="patients.html" class="nav-item"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+          <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Field Reports</span></a>
+          <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+        `,
+        hospital: `
+          <a href="index.html" class="nav-item active"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+          <a href="patients.html" class="nav-item"><span class="nav-icon">🩺</span><span>Patient Records</span></a>
+          <a href="alerts.html" class="nav-item"><span class="nav-icon">🚨</span><span>Outbreak Alerts</span><span class="badge">3</span></a>
+          <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Forecast</span></a>
+          <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>Risk Heatmap</span></a>
+          <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Community Intel</span></a>
+        `,
+      };
+      const navRole = (role === 'user' || role === 'citizen') ? 'citizen' : role;
+      if (navEl) navEl.innerHTML = navItems[navRole] || navItems.officer;
+
+      // Update breadcrumb
+      const bc = document.getElementById('bc-current');
+      if (bc) {
+        const labels = { citizen: 'Citizen Dashboard', officer: 'Officer Dashboard', hospital: 'Hospital Dashboard' };
+        bc.textContent = labels[navRole] || 'Dashboard';
+      }
+
+      // Render hospital disease chart if hospital role
+      if (role === 'hospital') {
+        setTimeout(() => renderHospDiseaseChart(), 400);
+      }
+    }
+
+    function renderHospDiseaseChart() {
+      const ctx = document.getElementById('hospDiseaseChart');
+      if (!ctx) return;
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Cholera', 'Typhoid', 'Hepatitis A', 'Dysentery', 'Leptospirosis'],
+          datasets: [{
+            data: [342, 218, 184, 143, 62],
+            backgroundColor: ['#ef4444','#f97316','#f59e0b','#3b82f6','#14b8a6'],
+            borderWidth: 0,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { font: { size: 11 }, color: '#64748b', padding: 12 } },
+            tooltip: { backgroundColor: '#1e293b', bodyColor: '#f1f5f9', padding: 10, cornerRadius: 8 }
+          }
+        }
+      });
+    }
+
+    function submitCitizenReport() {
+      alert('✅ Report submitted! A field inspection will be initiated within 12–24 hours. Thank you for keeping your community safe.');
+    }
+
+    function dispatchAlert() {
+      alert('🔔 Alert dispatched successfully to selected recipients. Response teams have been notified.');
+    }
+
+    // Animate bed capacity bars
+    document.addEventListener('DOMContentLoaded', () => {
+      initRoleDashboard();
+      const fills = document.querySelectorAll('.bed-fill, .kpi-fill, .db-bar');
+      fills.forEach(f => {
+        const w = f.style.width;
+        f.style.width = '0';
+        setTimeout(() => { f.style.width = w; }, 400);
+      });
+    });
+  </script>
+</body>
+</html>

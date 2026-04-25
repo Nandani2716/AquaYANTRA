@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Reports — AquaGuard</title>
+  <meta name="description" content="Citizen-reported water quality issues and disease symptoms for crowdsourced health surveillance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .community-layout { display:grid; grid-template-columns:1fr 380px; gap:16px; }
+    .report-card-full { display:flex; gap:14px; padding:18px 22px; border-bottom:1px solid var(--border); transition:background var(--transition); }
+    .report-card-full:hover { background:var(--bg2); }
+    .report-card-full:last-child { border-bottom:none; }
+    .rcf-avatar { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:white; flex-shrink:0; }
+    .rcf-body { flex:1; }
+    .rcf-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; gap:10px; }
+    .rcf-author { font-size:13.5px; font-weight:700; color:var(--text-primary); }
+    .rcf-tags { display:flex; gap:6px; }
+    .rcf-tag { font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:99px; }
+    .tag-v { background:#dcfce7; color:#16a34a; }
+    .tag-u { background:#fee2e2; color:#dc2626; }
+    .tag-p { background:#fef3c7; color:#d97706; }
+    .rcf-text { font-size:13px; color:var(--text-secondary); line-height:1.55; margin-bottom:8px; }
+    .rcf-footer { display:flex; gap:12px; align-items:center; }
+    .rcf-loc { font-size:11.5px; color:var(--text-muted); }
+    .rcf-time { font-size:11.5px; color:var(--text-muted); }
+    .rcf-upvote { font-size:12px; font-weight:600; color:var(--text-secondary); background:var(--bg); border:1.5px solid var(--border); padding:4px 10px; border-radius:99px; cursor:pointer; transition:all var(--transition); margin-left:auto; }
+    .rcf-upvote:hover { border-color:var(--blue-400); color:var(--blue-600); background:var(--blue-50); }
+    .report-form { display:flex; flex-direction:column; gap:14px; padding:22px; }
+    .rf-label { font-size:12.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; display:block; }
+    .rf-input, .rf-select, .rf-textarea { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); font-size:13.5px; font-family:'Inter',sans-serif; color:var(--text-primary); transition:border var(--transition); outline:none; }
+    .rf-input:focus, .rf-select:focus, .rf-textarea:focus { border-color:var(--blue-400); background:white; }
+    .rf-textarea { resize:vertical; min-height:80px; }
+    .rf-submit { padding:12px; background:linear-gradient(135deg,var(--blue-500),var(--cyan-500)); border:none; border-radius:var(--radius-sm); color:white; font-size:14px; font-weight:700; cursor:pointer; transition:all var(--transition); }
+    .rf-submit:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(59,130,246,0.35); }
+    .symptom-chips { display:flex; gap:6px; flex-wrap:wrap; }
+    .s-chip { padding:6px 12px; border:1.5px solid var(--border); border-radius:99px; cursor:pointer; font-size:12.5px; background:var(--bg); color:var(--text-secondary); transition:all var(--transition); }
+    .s-chip.sel { border-color:var(--blue-400); background:var(--blue-50); color:var(--blue-600); font-weight:600; }
+    .stats-band { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .sb-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:16px; text-align:center; box-shadow:var(--shadow); }
+    .sb-val { font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; }
+    .sb-lbl { font-size:11px; color:var(--text-muted); margin-top:3px; }
+    @media(max-width:960px){.community-layout{grid-template-columns:1fr;} .stats-band{grid-template-columns:repeat(2,1fr);}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg></div><span class="logo-text">AquaGuard</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item active"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-btn" onclick="toggleSidebar()">☰</button><div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">Community Reports</span></div></div>
+      <div class="topbar-right"><div class="realtime-chip"><span class="pulse-dot"></span><span>Live</span></div><div class="date-chip" id="live-date"></div></div>
+    </header>
+
+    <div class="page-body">
+      <div class="hero-section" style="background:linear-gradient(135deg,#f0fdf4,#eff6ff);">
+        <div class="hero-text">
+          <h1 class="hero-title">👥 Community Surveillance Hub</h1>
+          <p class="hero-sub">Empowering citizens to report water contamination and health symptoms in real-time. Crowdsourced data feeds into our ML model as early warning signals.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-shrink:0;">
+          <button onclick="document.getElementById('report-form-section').scrollIntoView({behavior:'smooth'})" style="padding:12px 22px;background:linear-gradient(135deg,var(--blue-500),var(--cyan-500));border:none;border-radius:var(--radius-sm);color:white;font-size:14px;font-weight:700;cursor:pointer;">+ Submit Report</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-band">
+        <div class="sb-card"><div class="sb-val" style="color:var(--blue-600)">847</div><div class="sb-lbl">Total Reports (7d)</div></div>
+        <div class="sb-card"><div class="sb-val" style="color:#16a34a">623</div><div class="sb-lbl">Verified Reports</div></div>
+        <div class="sb-card"><div class="sb-val" style="color:#f97316">127</div><div class="sb-lbl">Reports Today</div></div>
+        <div class="sb-card"><div class="sb-val" style="color:#ef4444">38</div><div class="sb-lbl">Triggered Alerts</div></div>
+      </div>
+
+      <!-- Layout -->
+      <div class="community-layout">
+        <!-- Feed -->
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Community Report Feed</div><div class="card-sub">Verified citizen submissions · Real-time</div></div>
+            <div class="card-actions">
+              <button class="chip-btn active">All</button>
+              <button class="chip-btn">Urgent</button>
+              <button class="chip-btn">Verified</button>
+              <button class="chip-btn">Pending</button>
+            </div>
+          </div>
+
+          <div id="report-feed">
+            <div class="report-card-full">
+              <div class="rcf-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)">RK</div>
+              <div class="rcf-body">
+                <div class="rcf-head">
+                  <div class="rcf-author">Rajesh Kumar</div>
+                  <div class="rcf-tags"><span class="rcf-tag tag-v">✓ Verified</span><span class="rcf-tag tag-u">🔴 Urgent</span></div>
+                </div>
+                <div class="rcf-text">"Foul smell from tap water in Sector 4 for 3 days. At least 8 families are experiencing diarrhea and vomiting. Municipal authority not responding to complaints."</div>
+                <div class="rcf-footer">
+                  <span class="rcf-loc">📍 Noida, Uttar Pradesh</span>
+                  <span class="rcf-time">1h ago</span>
+                  <button class="rcf-upvote" onclick="upvote(this)">👍 Upvote (24)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-card-full">
+              <div class="rcf-avatar" style="background:linear-gradient(135deg,#ec4899,#f97316)">PD</div>
+              <div class="rcf-body">
+                <div class="rcf-head">
+                  <div class="rcf-author">Priya Desai</div>
+                  <div class="rcf-tags"><span class="rcf-tag tag-u">🔴 Urgent</span></div>
+                </div>
+                <div class="rcf-text">"Children in our locality (Sarthana area) developed diarrhea after drinking water from the community well. 3 children admitted to hospital. Well water appears brownish."</div>
+                <div class="rcf-footer">
+                  <span class="rcf-loc">📍 Surat, Gujarat</span>
+                  <span class="rcf-time">3h ago</span>
+                  <button class="rcf-upvote" onclick="upvote(this)">👍 Upvote (41)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-card-full">
+              <div class="rcf-avatar" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">AM</div>
+              <div class="rcf-body">
+                <div class="rcf-head">
+                  <div class="rcf-author">Amit Mehta</div>
+                  <div class="rcf-tags"><span class="rcf-tag tag-v">✓ Verified</span></div>
+                </div>
+                <div class="rcf-text">"Water has turned yellowish after heavy rains yesterday. At least 15 households affected. Some people are developing stomach issues. Reporting from MP Nagar zone."</div>
+                <div class="rcf-footer">
+                  <span class="rcf-loc">📍 Bhopal, Madhya Pradesh</span>
+                  <span class="rcf-time">5h ago</span>
+                  <button class="rcf-upvote" onclick="upvote(this)">👍 Upvote (18)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-card-full">
+              <div class="rcf-avatar" style="background:linear-gradient(135deg,#14b8a6,#3b82f6)">SK</div>
+              <div class="rcf-body">
+                <div class="rcf-head">
+                  <div class="rcf-author">Sunita Kumari</div>
+                  <div class="rcf-tags"><span class="rcf-tag tag-p">⏳ Pending</span></div>
+                </div>
+                <div class="rcf-text">"Strong chlorine smell and slightly cloudy water from taps since morning. No illness yet but concerned about safety. Please check Shastri Nagar area water supply."</div>
+                <div class="rcf-footer">
+                  <span class="rcf-loc">📍 Patna, Bihar</span>
+                  <span class="rcf-time">7h ago</span>
+                  <button class="rcf-upvote" onclick="upvote(this)">👍 Upvote (9)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-card-full">
+              <div class="rcf-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">VP</div>
+              <div class="rcf-body">
+                <div class="rcf-head">
+                  <div class="rcf-author">Vikram Patel</div>
+                  <div class="rcf-tags"><span class="rcf-tag tag-v">✓ Verified</span></div>
+                </div>
+                <div class="rcf-text">"Sewage overflow near tube well in our area. Extremely concerned about water contamination. Local Gram Panchayat informed but no action taken for 2 days."</div>
+                <div class="rcf-footer">
+                  <span class="rcf-loc">📍 Varanasi, Uttar Pradesh</span>
+                  <span class="rcf-time">10h ago</span>
+                  <button class="rcf-upvote" onclick="upvote(this)">👍 Upvote (56)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Form -->
+        <div id="report-form-section">
+          <div class="card">
+            <div class="card-head"><div><div class="card-title">📝 Submit a Report</div><div class="card-sub">Help protect your community · Anonymous option available</div></div></div>
+            <form class="report-form" onsubmit="submitReport(event)">
+              <div>
+                <label class="rf-label">Your Name (optional)</label>
+                <input type="text" class="rf-input" placeholder="Anonymous" id="rep-name" />
+              </div>
+              <div>
+                <label class="rf-label">📍 Location</label>
+                <input type="text" class="rf-input" placeholder="City, State" id="rep-loc" required />
+              </div>
+              <div>
+                <label class="rf-label">Issue Type</label>
+                <select class="rf-select" id="rep-type">
+                  <option>💧 Contaminated Water</option>
+                  <option>🦠 Disease Symptoms Observed</option>
+                  <option>🚰 Water Supply Disruption</option>
+                  <option>🌊 Flooding / Sewage Overflow</option>
+                  <option>🔴 Other Safety Concern</option>
+                </select>
+              </div>
+              <div>
+                <label class="rf-label">Symptoms Observed (select all)</label>
+                <div class="symptom-chips">
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">Diarrhea</span>
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">Vomiting</span>
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">Fever</span>
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">Jaundice</span>
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">Stomach Pain</span>
+                  <span class="s-chip" onclick="this.classList.toggle('sel')">None yet</span>
+                </div>
+              </div>
+              <div>
+                <label class="rf-label">Describe the Issue</label>
+                <textarea class="rf-textarea" placeholder="Describe what you see or experience in detail..." id="rep-desc" required></textarea>
+              </div>
+              <div>
+                <label class="rf-label">Urgency Level</label>
+                <select class="rf-select" id="rep-urgency">
+                  <option>🚨 Emergency — Immediate action needed</option>
+                  <option>⚠️ High — Respond within 24 hours</option>
+                  <option>ℹ️ Normal — General concern</option>
+                </select>
+              </div>
+              <button type="submit" class="rf-submit" id="btn-submit-report">Submit Report →</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    function upvote(btn) {
+      const m = btn.textContent.match(/\((\d+)\)/);
+      if(m) { const n = parseInt(m[1])+1; btn.textContent = `👍 Upvote (${n})`; btn.style.color='var(--blue-600)'; btn.style.borderColor='var(--blue-400)'; }
+    }
+    function submitReport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-report');
+      btn.textContent = '✅ Report Submitted! Thank you.';
+      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+      setTimeout(()=>{ btn.textContent='Submit Report →'; btn.style.background=''; }, 3000);
+    }
+  </script>
+</body>
+</html>

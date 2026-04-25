@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — AquaGuard</title>
+  <meta name="description" content="Register for AquaGuard as a citizen or hospital to access India's waterborne disease surveillance platform." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-400: #60a5fa;
+      --blue-500: #3b82f6; --blue-600: #2563eb; --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+      --green: #22c55e; --orange: #f97316; --red: #ef4444; --purple: #a855f7;
+      --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+      --border: #dbeafe; --surface: #ffffff; --bg: #f0f7ff;
+      --radius: 16px; --radius-sm: 10px;
+    }
+    html, body { min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); }
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    .reg-wrapper {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* LEFT */
+    .left-panel {
+      background: linear-gradient(145deg, #7c3aed 0%, #2563eb 50%, #0ea5e9 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 52px;
+      overflow: hidden;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+      border-radius: 50%;
+    }
+    .lp-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 56px; position: relative; z-index: 1; }
+    .lp-logo-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+    .lp-logo-text { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: white; }
+    .lp-content { position: relative; z-index: 1; }
+    .lp-headline { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 800; color: white; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.5px; }
+    .lp-sub { font-size: 14.5px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 36px; }
+
+    .steps-list { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0; }
+    .step-item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .step-item:last-child { border-bottom: none; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .step-text { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; padding-top: 4px; }
+
+    /* RIGHT */
+    .right-panel {
+      background: var(--surface);
+      padding: 48px 52px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .reg-box { width: 100%; max-width: 440px; }
+
+    .reg-header { margin-bottom: 28px; }
+    .reg-title { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 5px; }
+    .reg-sub { font-size: 13.5px; color: var(--text-muted); }
+
+    /* Role toggle */
+    .role-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px;
+    }
+    .role-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 14px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      background: transparent;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .role-btn.active { background: var(--surface); border-color: var(--blue-400); box-shadow: 0 2px 12px rgba(59,130,246,0.15); }
+    .role-icon { font-size: 22px; }
+    .role-label { font-size: 13px; font-weight: 700; color: var(--text-secondary); }
+    .role-sub { font-size: 10.5px; color: var(--text-muted); }
+    .role-btn.active .role-label { color: var(--blue-600); }
+    .role-btn.active .role-sub { color: var(--blue-400); }
+
+    .reg-form { display: flex; flex-direction: column; gap: 15px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    .form-input, .form-select {
+      width: 100%; padding: 10px 13px 10px 40px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); font-size: 13.5px;
+      font-family: 'Inter', sans-serif; color: var(--text-primary);
+      transition: all 0.2s; outline: none; appearance: none;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--blue-400); background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .eye-btn { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text-muted); padding: 3px; }
+    .eye-btn:hover { color: var(--text-secondary); }
+
+    /* Password strength */
+    .pwd-strength { margin-top: 5px; }
+    .pwd-strength-bar { height: 4px; border-radius: 99px; background: var(--border); overflow: hidden; margin-bottom: 4px; }
+    .pwd-strength-fill { height: 100%; border-radius: 99px; width: 0; transition: all 0.3s; }
+    .pwd-strength-text { font-size: 11px; color: var(--text-muted); }
+
+    .hospital-section { display: none; flex-direction: column; gap: 15px; }
+    .hospital-section.visible { display: flex; }
+    .section-divider { display: flex; align-items: center; gap: 10px; }
+    .sd-line { flex: 1; height: 1px; background: var(--border); }
+    .sd-label { font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; background: white; padding: 0 8px; white-space: nowrap; }
+
+    .verification-notice {
+      background: linear-gradient(135deg, #f5f3ff, #eff6ff);
+      border: 1.5px solid #c4b5fd;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .vn-icon { font-size: 18px; flex-shrink: 0; }
+    .vn-text { font-size: 12px; color: #7c3aed; line-height: 1.5; }
+
+    .terms-check { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--text-secondary); cursor: pointer; line-height: 1.4; }
+    .terms-check input { accent-color: var(--blue-500); width: 15px; height: 15px; margin-top: 1px; flex-shrink: 0; }
+    .terms-check a { color: var(--blue-600); }
+
+    .submit-btn {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+      border: none; border-radius: var(--radius-sm);
+      color: white; font-size: 14.5px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+    .hosp-style    { background: linear-gradient(135deg, #7c3aed, #3b82f6) !important; }
+    .officer-style { background: linear-gradient(135deg, #059669, #0ea5e9) !important; }
+
+    .auth-msg { display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; align-items: center; gap: 8px; }
+    .auth-msg.error { display: flex; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .auth-msg.success { display: flex; background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+
+    .login-link { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 14px; }
+    .login-link a { color: var(--blue-600); font-weight: 600; text-decoration: none; }
+    .login-link a:hover { text-decoration: underline; }
+
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reg-box { animation: fadeSlideUp 0.4s ease both; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 17px; height: 17px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    .submit-btn.loading .spinner { display: block; }
+
+    @media (max-width: 900px) { .reg-wrapper { grid-template-columns: 1fr; } .left-panel { display: none; } .right-panel { padding: 40px 28px; } }
+    @media (max-width: 480px) { .right-panel { padding: 32px 18px; } .form-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="reg-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div>
+      <div class="lp-logo">
+        <div class="lp-logo-icon">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="white" fill-opacity="0.9"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(59,130,246,0.8)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <span class="lp-logo-text">AquaGuard</span>
+      </div>
+      <div class="lp-content">
+        <h1 class="lp-headline">Join India's Public Health Safety Network</h1>
+        <p class="lp-sub">Whether you're a citizen reporting a local issue or a hospital feeding clinical data — your participation strengthens the national early warning system.</p>
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong style="color:white;">Choose your role</strong> — Citizen or Hospital / Official</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">Fill in your details and verify your identity</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">Hospital accounts are reviewed within 24–48 hours for ABDM verification</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text">Access the dashboard, report issues, and view live alerts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="reg-box">
+      <div class="reg-header">
+        <div class="reg-title" id="reg-title">Create Your Account</div>
+        <p class="reg-sub" id="reg-sub">Join thousands of health professionals and citizens on AquaGuard</p>
+      </div>
+
+      <!-- Role Toggle -->
+      <div class="role-toggle">
+        <button class="role-btn active" id="r-user" onclick="setReg('user')">
+          <span class="role-icon">👤</span>
+          <span class="role-label">Citizen</span>
+          <span class="role-sub">Report & monitor</span>
+        </button>
+        <button class="role-btn" id="r-officer" onclick="setReg('officer')">
+          <span class="role-icon">🛡️</span>
+          <span class="role-label">Officer</span>
+          <span class="role-sub">CPCB / Ministry</span>
+        </button>
+        <button class="role-btn" id="r-hosp" onclick="setReg('hospital')">
+          <span class="role-icon">🏥</span>
+          <span class="role-label">Hospital</span>
+          <span class="role-sub">Clinical data access</span>
+        </button>
+      </div>
+
+      <div class="auth-msg" id="reg-msg"></div>
+
+      <form class="reg-form" id="reg-form" onsubmit="handleRegister(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fname">First Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" class="form-input" id="fname" placeholder="First name" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lname">Last Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" class="form-input" id="lname" placeholder="Last name" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" class="form-input" id="reg-email" placeholder="you@example.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Mobile Number (Aadhaar linked)</label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input type="tel" class="form-input" id="phone" placeholder="+91 98765 43210" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="state">State</label>
+          <div class="input-wrap">
+            <span class="input-icon">📍</span>
+            <select class="form-select" id="state">
+              <option value="">Select your state…</option>
+              <option>Andhra Pradesh</option><option>Bihar</option><option>Delhi</option>
+              <option>Gujarat</option><option>Jharkhand</option><option>Karnataka</option>
+              <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option>
+              <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+              <option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option>
+              <option>Uttarakhand</option><option>West Bengal</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hospital-only section -->
+        <div class="hospital-section" id="hosp-section">
+          <div class="section-divider">
+            <div class="sd-line"></div>
+            <div class="sd-label">Hospital Details</div>
+            <div class="sd-line"></div>
+          </div>
+
+          <div class="verification-notice">
+            <span class="vn-icon">🔒</span>
+            <div class="vn-text">Hospital accounts are verified against the ABDM registry within 24–48 hours. You'll receive an email once your account is approved.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hosp-name">Hospital / Institution Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏨</span>
+              <input type="text" class="form-input" id="hosp-name" placeholder="e.g. AIIMS New Delhi" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-abdm">ABDM Facility ID</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔑</span>
+              <input type="text" class="form-input" id="reg-abdm" placeholder="e.g. IN-HOS-DL-001234" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-dept">Department</label>
+              <div class="input-wrap">
+                <span class="input-icon">🩺</span>
+                <select class="form-select" id="reg-dept">
+                  <option value="">Select…</option>
+                  <option>Epidemiology</option>
+                  <option>Emergency Medicine</option>
+                  <option>Internal Medicine</option>
+                  <option>Microbiology Lab</option>
+                  <option>Hospital Administration</option>
+                  <option>Ministry Official</option>
+                  <option>CPCB Officer</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="designation">Designation</label>
+              <div class="input-wrap">
+                <span class="input-icon">🏅</span>
+                <input type="text" class="form-input" id="designation" placeholder="e.g. CMO" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hosp-doc">Upload Staff ID (optional)</label>
+            <div class="input-wrap" style="display:flex;align-items:center;gap:10px;">
+              <input type="file" id="hosp-doc" accept=".pdf,.jpg,.png" style="padding:8px 12px;padding-left:12px;font-size:12.5px;" class="form-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-pwd">Create Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="reg-pwd" placeholder="Min. 8 characters" required onkeyup="checkStrength(this.value)" />
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-pwd',this)">👁️</button>
+          </div>
+          <div class="pwd-strength">
+            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="str-fill"></div></div>
+            <div class="pwd-strength-text" id="str-text">Enter a password</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-pwd2">Confirm Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="reg-pwd2" placeholder="Repeat password" required />
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-pwd2',this)">👁️</button>
+          </div>
+        </div>
+
+        <label class="terms-check">
+          <input type="checkbox" id="terms" required />
+          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I confirm all details are accurate and I consent to data processing under the DPDP Act 2023.
+        </label>
+
+        <button type="submit" class="submit-btn" id="reg-submit">
+          <div class="spinner"></div>
+          <span id="reg-btn-text">Create Account →</span>
+        </button>
+
+      </form>
+
+      <div class="login-link">Already have an account? <a href="login.html">Sign in →</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let regRole = 'user';
+
+  function setReg(role) {
+    regRole = role;
+    document.getElementById('r-user').classList.toggle('active', role === 'user');
+    document.getElementById('r-officer').classList.toggle('active', role === 'officer');
+    document.getElementById('r-hosp').classList.toggle('active', role === 'hospital');
+
+    const hs     = document.getElementById('hosp-section');
+    const btn    = document.getElementById('reg-submit');
+    const title  = document.getElementById('reg-title');
+    const sub    = document.getElementById('reg-sub');
+    const btnTxt = document.getElementById('reg-btn-text');
+
+    // Reset styles
+    btn.classList.remove('hosp-style', 'officer-style');
+    hs.classList.remove('visible');
+
+    if (role === 'hospital') {
+      hs.classList.add('visible');
+      btn.classList.add('hosp-style');
+      title.textContent = 'Register as Hospital Authority';
+      sub.textContent   = 'ABDM-verified access for medical institutions';
+      btnTxt.textContent = 'Submit Registration →';
+    } else if (role === 'officer') {
+      btn.classList.add('officer-style');
+      title.textContent = 'Register as Health / CPCB Officer';
+      sub.textContent   = 'Official access for health officers & ministry staff';
+      btnTxt.textContent = 'Submit Officer Registration →';
+    } else {
+      title.textContent = 'Create Your Account';
+      sub.textContent   = 'Join thousands of health professionals and citizens on AquaGuard';
+      btnTxt.textContent = 'Create Account →';
+    }
+  }
+
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+  }
+
+  function checkStrength(pwd) {
+    const fill = document.getElementById('str-fill');
+    const txt  = document.getElementById('str-text');
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    const levels = [
+      { w: '0%',   bg: 'transparent', t: 'Enter a password' },
+      { w: '25%',  bg: '#ef4444',     t: '⚠️ Weak' },
+      { w: '50%',  bg: '#f97316',     t: '⚡ Fair' },
+      { w: '75%',  bg: '#f59e0b',     t: '👍 Good' },
+      { w: '100%', bg: '#22c55e',     t: '✅ Strong' },
+    ];
+    const l = levels[score];
+    fill.style.width = l.w;
+    fill.style.background = l.bg;
+    txt.style.color = l.bg === 'transparent' ? '#94a3b8' : l.bg;
+    txt.textContent = l.t;
+  }
+
+  function showMsg(type, text) {
+    const el = document.getElementById('reg-msg');
+    el.textContent = (type === 'error' ? '⚠️ ' : '✅ ') + text;
+    el.className = 'auth-msg ' + type;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function handleRegister(e) {
+    e.preventDefault();
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pwd   = document.getElementById('reg-pwd').value;
+    const pwd2  = document.getElementById('reg-pwd2').value;
+    const terms = document.getElementById('terms').checked;
+
+    if (!fname || !lname || !email || !pwd) { showMsg('error', 'Please fill in all required fields.'); return; }
+    if (pwd !== pwd2) { showMsg('error', 'Passwords do not match. Please try again.'); return; }
+    if (pwd.length < 8) { showMsg('error', 'Password must be at least 8 characters long.'); return; }
+    if (!terms) { showMsg('error', 'Please accept the terms and conditions to continue.'); return; }
+
+    const btn = document.getElementById('reg-submit');
+    btn.classList.add('loading');
+    document.getElementById('reg-btn-text').textContent = 'Creating account…';
+
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      if (regRole === 'hospital') {
+        showMsg('success', `Registration submitted! Your hospital account is pending ABDM verification (24–48 hours). Check your email at ${email}.`);
+        document.getElementById('reg-btn-text').textContent = '✅ Registration Submitted';
+        btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+      } else if (regRole === 'officer') {
+        showMsg('success', `Officer registration submitted! Your account is pending Ministry / CPCB verification (24–48 hours). Check your email at ${email}.`);
+        document.getElementById('reg-btn-text').textContent = '✅ Registration Submitted';
+        btn.style.background = 'linear-gradient(135deg,#059669,#0ea5e9)';
+      } else {
+        sessionStorage.setItem('aq_user', JSON.stringify({ name: `${fname} ${lname}`, email, role: 'user' }));
+        showMsg('success', `Account created! Welcome, ${fname}. Redirecting to your dashboard…`);
+        document.getElementById('reg-btn-text').textContent = '✅ Account Created!';
+        btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+      }
+    }, 1800);
+  }
+</script>
+</body>
+</html>

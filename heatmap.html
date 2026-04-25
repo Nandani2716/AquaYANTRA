@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Water Risk Heatmap — AquaGuard</title>
+  <meta name="description" content="Interactive India heatmap showing water quality risk zones, district-level data, and CPCB sensor locations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .heatmap-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; }
+    .map-full-card { min-height:560px; display:flex; flex-direction:column; }
+    .map-area { flex:1; position:relative; background:linear-gradient(135deg,#eff6ff,#e0f2fe); display:flex; align-items:center; justify-content:center; padding:20px; overflow:hidden; min-height:480px; }
+    .india-map-large { width:100%; max-width:480px; height:100%; }
+    .map-tooltip { position:absolute; background:#1e293b; color:white; padding:10px 14px; border-radius:10px; font-size:12px; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:10; }
+    .map-tooltip.show { opacity:1; }
+    .filter-bar { display:flex; gap:8px; flex-wrap:wrap; }
+    .risk-panel-card { }
+    .risk-list { padding:12px 0; }
+    .risk-entry { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-bottom:1px solid var(--border); gap:10px; cursor:pointer; transition:background var(--transition); }
+    .risk-entry:hover { background:var(--bg2); }
+    .risk-entry:last-child { border-bottom:none; }
+    .re-left { display:flex; align-items:center; gap:10px; }
+    .re-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .re-name { font-size:13px; font-weight:600; color:var(--text-primary); }
+    .re-state { font-size:11px; color:var(--text-muted); }
+    .re-badge { font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; }
+    .legend-full { display:flex; flex-direction:column; gap:8px; padding:16px 20px; border-top:1px solid var(--border); }
+    .lf-row { display:flex; align-items:center; gap:10px; }
+    .lf-swatch { width:24px; height:10px; border-radius:3px; }
+    .lf-label { font-size:12px; color:var(--text-secondary); font-weight:500; flex:1; }
+    .lf-count { font-size:12px; font-weight:700; color:var(--text-primary); }
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:0; }
+    @media(max-width:900px){.heatmap-layout{grid-template-columns:1fr;}}
+    /* Zone circles */
+    .zone-circle { cursor:pointer; transition:all 0.2s; }
+    .zone-circle:hover { transform-origin:center; filter:brightness(1.2) drop-shadow(0 0 8px rgba(0,0,0,0.3)); }
+    .zone-label { font-family:'Inter',sans-serif; font-size:7px; font-weight:600; fill:white; pointer-events:none; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2C14 2 4 10.5 4 17a10 10 0 0020 0C24 10.5 14 2 14 2z" fill="url(#lg1)"/><path d="M10 18.5a5 5 0 006 0" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="lg1" x1="4" y1="2" x2="24" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs></svg></div>
+      <span class="logo-text">AquaGuard</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+      <a href="water-quality.html" class="nav-item"><span class="nav-icon">🧪</span><span>Water Quality</span></a>
+      <a href="heatmap.html" class="nav-item active"><span class="nav-icon">🗺️</span><span>India Heatmap</span></a>
+      <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span><span>Alerts</span><span class="badge">3</span></a>
+      <a href="patients.html" class="nav-item"><span class="nav-icon">🏥</span><span>Patient Intel</span></a>
+      <a href="community.html" class="nav-item"><span class="nav-icon">👥</span><span>Community</span></a>
+      <a href="analytics.html" class="nav-item"><span class="nav-icon">📊</span><span>ML Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="user-chip"><div class="user-avatar">NS</div><div class="user-info"><div class="user-name">Nandani Shukla</div><div class="user-role">Health Officer</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="breadcrumb"><span class="bc-home">Home</span><span class="bc-sep">›</span><span class="bc-current">India Heatmap</span></div>
+      </div>
+      <div class="topbar-right">
+        <div class="realtime-chip"><span class="pulse-dot"></span><span>Live</span></div>
+        <div class="date-chip" id="live-date"></div>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <div class="hero-section" style="background:linear-gradient(135deg,#f0fdf4,#eff6ff);">
+        <div class="hero-text">
+          <h1 class="hero-title">🗺️ India Water Risk Heatmap</h1>
+          <p class="hero-sub">District-wise water quality risk visualization. Click on any zone for detailed data. Updated every hour from CPCB sensors.</p>
+        </div>
+        <div class="hero-status-strip">
+          <div class="status-item status-safe"><span class="s-icon">🟢</span><div><div class="s-val">412</div><div class="s-lbl">Safe Districts</div></div></div>
+          <div class="status-item status-warn"><span class="s-icon">🟡</span><div><div class="s-val">38</div><div class="s-lbl">At Risk</div></div></div>
+          <div class="status-item status-danger"><span class="s-icon">🔴</span><div><div class="s-val">9</div><div class="s-lbl">Critical</div></div></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">Filter by Risk:</span>
+        <div class="filter-bar">
+          <button class="chip-btn active" onclick="filterRisk('all',this)">All Zones</button>
+          <button class="chip-btn" onclick="filterRisk('critical',this)">🔴 Critical</button>
+          <button class="chip-btn" onclick="filterRisk('risk',this)">🟡 At Risk</button>
+          <button class="chip-btn" onclick="filterRisk('safe',this)">🟢 Safe</button>
+        </div>
+      </div>
+
+      <!-- Heatmap Layout -->
+      <div class="heatmap-layout">
+        <!-- Map Card -->
+        <div class="card map-full-card">
+          <div class="card-head">
+            <div><div class="card-title">Water Quality Risk Map — India</div><div class="card-sub">Circle size = population at risk · Color = risk level</div></div>
+          </div>
+          <div class="map-area" id="mapArea">
+            <div class="map-tooltip" id="mapTip"></div>
+            <svg class="india-map-large" viewBox="0 0 500 580" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- India outline -->
+              <path d="M250 30 L310 55 L370 90 L420 145 L440 200 L435 260 L415 310 L395 355 L375 395 L355 435 L335 468 L315 498 L295 525 L278 550 L265 568 L258 576 L250 568 L242 555 L228 532 L210 505 L190 478 L168 448 L148 415 L128 378 L110 338 L92 295 L78 248 L72 200 L82 148 L115 98 L162 62 Z"
+                fill="url(#mapGrad)" stroke="#93c5fd" stroke-width="2"/>
+              <!-- Decorative state lines -->
+              <line x1="250" y1="30" x2="250" y2="220" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+              <line x1="78" y1="200" x2="440" y2="200" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+              <line x1="92" y1="295" x2="415" y2="295" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="128" y1="378" x2="375" y2="378" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+              <line x1="82" y1="148" x2="310" y2="55" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+              <!-- Critical zones (red) -->
+              <g class="zone-circle" onclick="showZoneInfo('Varanasi, UP','Critical','WQI: 34 · Coliform: 642 CFU/mL · Cholera risk HIGH','#ef4444')">
+                <circle cx="310" cy="188" r="20" fill="rgba(239,68,68,0.85)" stroke="white" stroke-width="1.5"/>
+                <text x="310" y="185" text-anchor="middle" class="zone-label">Varanasi</text>
+                <text x="310" y="193" text-anchor="middle" class="zone-label">UP</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Patna, Bihar','High Risk','WQI: 52 · Turbidity: 12.4 NTU · Watch alert active','#f97316')">
+                <circle cx="318" cy="238" r="16" fill="rgba(249,115,22,0.85)" stroke="white" stroke-width="1.5"/>
+                <text x="318" y="235" text-anchor="middle" class="zone-label">Patna</text>
+                <text x="318" y="243" text-anchor="middle" class="zone-label">BR</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Kolkata, WB','High Risk','WQI: 59 · pH: 9.8 anomaly detected','#f97316')">
+                <circle cx="368" cy="275" r="15" fill="rgba(249,115,22,0.8)" stroke="white" stroke-width="1.5"/>
+                <text x="368" y="272" text-anchor="middle" class="zone-label">Kolkata</text>
+                <text x="368" y="280" text-anchor="middle" class="zone-label">WB</text>
+              </g>
+              <!-- At-risk zones (yellow) -->
+              <g class="zone-circle" onclick="showZoneInfo('Surat, Gujarat','At Risk','WQI: 61 · Turbidity elevated · Community reports filed','#f59e0b')">
+                <circle cx="162" cy="270" r="14" fill="rgba(245,158,11,0.8)" stroke="white" stroke-width="1.5"/>
+                <text x="162" y="267" text-anchor="middle" class="zone-label">Surat</text>
+                <text x="162" y="275" text-anchor="middle" class="zone-label">GJ</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Delhi, NCR','At Risk','WQI: 63 · DO slightly low · Monitoring closely','#f59e0b')">
+                <circle cx="240" cy="162" r="15" fill="rgba(245,158,11,0.8)" stroke="white" stroke-width="1.5"/>
+                <text x="240" y="159" text-anchor="middle" class="zone-label">Delhi</text>
+                <text x="240" y="167" text-anchor="middle" class="zone-label">NCR</text>
+              </g>
+              <!-- Safe zones (green) -->
+              <g class="zone-circle" onclick="showZoneInfo('Mumbai, MH','Safe','WQI: 78 · All params normal · No alerts','#22c55e')">
+                <circle cx="165" cy="318" r="14" fill="rgba(34,197,94,0.8)" stroke="white" stroke-width="1.5"/>
+                <text x="165" y="315" text-anchor="middle" class="zone-label">Mumbai</text>
+                <text x="165" y="323" text-anchor="middle" class="zone-label">MH</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Chennai, TN','Safe','WQI: 83 · Excellent water quality · Recovered','#22c55e')">
+                <circle cx="275" cy="438" r="13" fill="rgba(34,197,94,0.8)" stroke="white" stroke-width="1.5"/>
+                <text x="275" y="435" text-anchor="middle" class="zone-label">Chennai</text>
+                <text x="275" y="443" text-anchor="middle" class="zone-label">TN</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Bengaluru, KA','Safe','WQI: 80 · TDS within limits · Safe for consumption','#22c55e')">
+                <circle cx="230" cy="405" r="12" fill="rgba(34,197,94,0.75)" stroke="white" stroke-width="1.5"/>
+                <text x="230" y="402" text-anchor="middle" class="zone-label">Bengaluru</text>
+                <text x="230" y="410" text-anchor="middle" class="zone-label">KA</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Jaipur, RJ','Safe','WQI: 74 · Normal parameters · Active monitoring','#22c55e')">
+                <circle cx="188" cy="182" r="13" fill="rgba(34,197,94,0.75)" stroke="white" stroke-width="1.5"/>
+                <text x="188" y="179" text-anchor="middle" class="zone-label">Jaipur</text>
+                <text x="188" y="187" text-anchor="middle" class="zone-label">RJ</text>
+              </g>
+              <g class="zone-circle" onclick="showZoneInfo('Hyderabad, TS','Safe','WQI: 77 · All params in range · 3 active sensors','#22c55e')">
+                <circle cx="258" cy="358" r="12" fill="rgba(34,197,94,0.75)" stroke="white" stroke-width="1.5"/>
+                <text x="258" y="355" text-anchor="middle" class="zone-label">Hyd.</text>
+                <text x="258" y="363" text-anchor="middle" class="zone-label">TS</text>
+              </g>
+              <defs>
+                <linearGradient id="mapGrad" x1="72" y1="30" x2="440" y2="580" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#dbeafe"/>
+                  <stop offset="0.5" stop-color="#bfdbfe"/>
+                  <stop offset="1" stop-color="#93c5fd"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <!-- Legend -->
+          <div class="legend-full">
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Risk Level Legend</div>
+            <div class="lf-row"><div class="lf-swatch" style="background:#ef4444;"></div><div class="lf-label">Critical — Immediate action required</div><div class="lf-count">9</div></div>
+            <div class="lf-row"><div class="lf-swatch" style="background:#f97316;"></div><div class="lf-label">High Risk — Ministry alerted</div><div class="lf-count">18</div></div>
+            <div class="lf-row"><div class="lf-swatch" style="background:#f59e0b;"></div><div class="lf-label">At Risk — Enhanced monitoring</div><div class="lf-count">38</div></div>
+            <div class="lf-row"><div class="lf-swatch" style="background:#22c55e;"></div><div class="lf-label">Safe — Within normal parameters</div><div class="lf-count">412</div></div>
+          </div>
+        </div>
+
+        <!-- Risk Panel -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <!-- Zone Info Card -->
+          <div class="card" id="zoneInfoCard">
+            <div class="card-head"><div><div class="card-title">📍 Zone Details</div><div class="card-sub">Click any zone on the map</div></div></div>
+            <div style="padding:20px;" id="zoneBody">
+              <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">
+                <div style="font-size:32px;margin-bottom:8px;">🗺️</div>
+                <div>Select a zone on the map to see detailed water quality information</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Critical Zones List -->
+          <div class="card">
+            <div class="card-head"><div><div class="card-title">🚨 Critical Zones</div><div class="card-sub">Immediate action required</div></div></div>
+            <div class="risk-list">
+              <div class="risk-entry" onclick="showZoneInfo('Varanasi, UP','Critical','WQI: 34 · Coliform: 642 CFU/mL · Cholera risk HIGH','#ef4444')">
+                <div class="re-left"><div class="re-dot" style="background:#ef4444"></div><div><div class="re-name">Varanasi</div><div class="re-state">Uttar Pradesh</div></div></div>
+                <div class="re-badge" style="background:#fee2e2;color:#dc2626">WQI 34</div>
+              </div>
+              <div class="risk-entry" onclick="showZoneInfo('Agra, UP','Critical','WQI: 41 · BOD high · Typhoid alert','#ef4444')">
+                <div class="re-left"><div class="re-dot" style="background:#ef4444"></div><div><div class="re-name">Agra</div><div class="re-state">Uttar Pradesh</div></div></div>
+                <div class="re-badge" style="background:#fee2e2;color:#dc2626">WQI 41</div>
+              </div>
+              <div class="risk-entry" onclick="showZoneInfo('Muzaffarpur, BR','Critical','WQI: 38 · Coliform 490 CFU/mL','#ef4444')">
+                <div class="re-left"><div class="re-dot" style="background:#ef4444"></div><div><div class="re-name">Muzaffarpur</div><div class="re-state">Bihar</div></div></div>
+                <div class="re-badge" style="background:#fee2e2;color:#dc2626">WQI 38</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- At Risk List -->
+          <div class="card">
+            <div class="card-head"><div><div class="card-title">⚠️ High Risk Zones</div><div class="card-sub">Ministry notified · Monitoring active</div></div></div>
+            <div class="risk-list">
+              <div class="risk-entry"><div class="re-left"><div class="re-dot" style="background:#f97316"></div><div><div class="re-name">Patna</div><div class="re-state">Bihar</div></div></div><div class="re-badge" style="background:#ffedd5;color:#c2410c">WQI 52</div></div>
+              <div class="risk-entry"><div class="re-left"><div class="re-dot" style="background:#f97316"></div><div><div class="re-name">Kolkata East</div><div class="re-state">West Bengal</div></div></div><div class="re-badge" style="background:#ffedd5;color:#c2410c">WQI 59</div></div>
+              <div class="risk-entry"><div class="re-left"><div class="re-dot" style="background:#f59e0b"></div><div><div class="re-name">Surat</div><div class="re-state">Gujarat</div></div></div><div class="re-badge" style="background:#fef3c7;color:#d97706">WQI 61</div></div>
+              <div class="risk-entry"><div class="re-left"><div class="re-dot" style="background:#f59e0b"></div><div><div class="re-name">Delhi NCR</div><div class="re-state">National Capital</div></div></div><div class="re-badge" style="background:#fef3c7;color:#d97706">WQI 63</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    function showZoneInfo(name, status, detail, color) {
+      const colors = { '#ef4444': ['#fee2e2','#dc2626'], '#f97316': ['#ffedd5','#c2410c'], '#f59e0b': ['#fef3c7','#d97706'], '#22c55e': ['#dcfce7','#16a34a'] };
+      const [bg, fg] = colors[color] || ['#eff6ff','#2563eb'];
+      document.getElementById('zoneBody').innerHTML = `
+        <div style="padding:8px 0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-primary);">${name}</div>
+          </div>
+          <div style="background:${bg};border-radius:8px;padding:10px 14px;margin-bottom:14px;">
+            <div style="font-size:11px;font-weight:700;color:${fg};text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Status</div>
+            <div style="font-size:14px;font-weight:600;color:${fg};">${status}</div>
+          </div>
+          <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">${detail}</div>
+          <button onclick="window.location.href='alerts.html'" style="margin-top:14px;width:100%;padding:10px;background:${color};border:none;border-radius:8px;color:white;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;">Send Alert for This Zone</button>
+        </div>`;
+      document.querySelector('#zoneInfoCard .card-sub').textContent = name;
+    }
+    function filterRisk(type, btn) {
+      document.querySelectorAll('.filter-bar .chip-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

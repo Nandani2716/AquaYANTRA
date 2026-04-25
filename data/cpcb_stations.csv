@@ -1,0 +1,31 @@
+station_id,station_name,city,district,state,state_code,latitude,longitude,river_basin,source_type,installation_year,last_calibrated,status
+CPCB-UP-001,Varanasi Ghat Sensor,Varanasi,Varanasi,Uttar Pradesh,UP,25.3176,82.9739,Ganga,River,2019,2026-03-15,Active
+CPCB-UP-002,Allahabad Triveni,Prayagraj,Prayagraj,Uttar Pradesh,UP,25.4358,81.8463,Ganga,River,2020,2026-03-20,Active
+CPCB-UP-003,Agra Yamuna Watch,Agra,Agra,Uttar Pradesh,UP,27.1767,78.0081,Yamuna,River,2018,2026-02-28,Active
+CPCB-UP-004,Kanpur Industrial Zone,Kanpur,Kanpur Nagar,Uttar Pradesh,UP,26.4499,80.3319,Ganga,River,2019,2026-03-10,Active
+CPCB-UP-005,Lucknow Gomti Point,Lucknow,Lucknow,Uttar Pradesh,UP,26.8467,80.9462,Gomti,River,2021,2026-04-01,Active
+CPCB-BR-001,Patna Ganga Ghat,Patna,Patna,Bihar,BR,25.5941,85.1376,Ganga,River,2019,2026-03-18,Active
+CPCB-BR-002,Muzaffarpur Burhi Gandak,Muzaffarpur,Muzaffarpur,Bihar,BR,26.1197,85.3910,Burhi Gandak,River,2020,2026-03-25,Active
+CPCB-BR-003,Gaya Falgu River,Gaya,Gaya,Bihar,BR,24.7914,84.9994,Falgu,River,2021,2026-04-02,Active
+CPCB-WB-001,Kolkata Hooghly,Kolkata,Kolkata,West Bengal,WB,22.5726,88.3639,Hooghly,River,2018,2026-03-12,Active
+CPCB-WB-002,Howrah Bridge Point,Howrah,Howrah,West Bengal,WB,22.5839,88.3418,Hooghly,River,2019,2026-03-22,Active
+CPCB-WB-003,Kolkata East Canal,Kolkata,North 24 Parganas,West Bengal,WB,22.6205,88.4260,Canal,Canal,2020,2026-02-15,Active
+CPCB-MH-001,Mumbai Dharavi Creek,Mumbai,Mumbai,Maharashtra,MH,19.0760,72.8777,Arabian Sea,Creek,2018,2026-03-30,Active
+CPCB-MH-002,Pune Mula-Mutha,Pune,Pune,Maharashtra,MH,18.5204,73.8567,Mula-Mutha,River,2020,2026-04-05,Active
+CPCB-MH-003,Nashik Godavari,Nashik,Nashik,Maharashtra,MH,20.0059,73.7897,Godavari,River,2021,2026-03-28,Active
+CPCB-TN-001,Chennai Cooum River,Chennai,Chennai,Tamil Nadu,TN,13.0827,80.2707,Cooum,River,2019,2026-04-08,Active
+CPCB-TN-002,Madurai Vaigai,Madurai,Madurai,Tamil Nadu,TN,9.9252,78.1198,Vaigai,River,2020,2026-03-16,Active
+CPCB-KA-001,Bengaluru Vrishabhavathi,Bengaluru,Bengaluru Urban,Karnataka,KA,12.9716,77.5946,Vrishabhavathi,River,2019,2026-04-03,Active
+CPCB-KA-002,Mysuru Kabini,Mysuru,Mysuru,Karnataka,KA,12.2958,76.6394,Kabini,Reservoir,2021,2026-03-14,Active
+CPCB-GJ-001,Surat Tapi River,Surat,Surat,Gujarat,GJ,21.1702,72.8311,Tapi,River,2018,2026-03-08,Active
+CPCB-GJ-002,Ahmedabad Sabarmati,Ahmedabad,Ahmedabad,Gujarat,GJ,23.0225,72.5714,Sabarmati,River,2019,2026-03-18,Active
+CPCB-RJ-001,Jaipur Dravyavati,Jaipur,Jaipur,Rajasthan,RJ,26.9124,75.7873,Dravyavati,River,2020,2026-04-01,Active
+CPCB-RJ-002,Jodhpur Kaylana Lake,Jodhpur,Jodhpur,Rajasthan,RJ,26.2389,73.0243,Kaylana,Lake,2021,2026-03-20,Active
+CPCB-MP-001,Bhopal Upper Lake,Bhopal,Bhopal,Madhya Pradesh,MP,23.2599,77.4126,Upper Lake,Lake,2019,2026-02-22,Active
+CPCB-MP-002,Indore Khan River,Indore,Indore,Madhya Pradesh,MP,22.7196,75.8577,Khan,River,2020,2026-03-15,Active
+CPCB-DL-001,Delhi Yamuna Palla,Delhi,North Delhi,Delhi,DL,28.7041,77.1025,Yamuna,River,2017,2026-04-06,Active
+CPCB-DL-002,Delhi Wazirabad Barrage,Delhi,North Delhi,Delhi,DL,28.7319,77.2040,Yamuna,Barrage,2018,2026-03-29,Active
+CPCB-DL-003,Okhla Barrage Delhi,Delhi,South Delhi,Delhi,DL,28.5562,77.2410,Yamuna,Barrage,2019,2026-03-10,Active
+CPCB-OR-001,Bhubaneswar Daya River,Bhubaneswar,Khurda,Odisha,OR,20.2961,85.8245,Daya,River,2020,2026-03-25,Active
+CPCB-AS-001,Guwahati Brahmaputra,Guwahati,Kamrup Metropolitan,Assam,AS,26.1445,91.7362,Brahmaputra,River,2020,2026-04-02,Active
+CPCB-PB-001,Amritsar Sutlej Canal,Amritsar,Amritsar,Punjab,PB,31.6340,74.8723,Sutlej,Canal,2021,2026-03-18,Active
